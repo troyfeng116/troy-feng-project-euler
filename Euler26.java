@@ -64,7 +64,6 @@ public class Euler26 {
 		remainder = remainder % n;
 		int ans = 0;
 		while (!found[remainder]) {
-			//System.out.println("found " + remainder);
 			if (remainder == 0) return 0;
 			found[remainder] = true;
 			remainder *= 10;
@@ -86,7 +85,6 @@ public class Euler26 {
 			if (cycle > longest) {
 				longest = cycle;
 				d = n;
-				
 			}
 			longestCycle[n+1] = d;
 		}

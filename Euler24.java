@@ -68,7 +68,6 @@ public class Euler24 {
 			factorial[i] = factorial[i-1] * i;
 		}
 		
-		//for (int i: bracket(123456789)) System.out.print(i + " ");
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
@@ -76,7 +75,6 @@ public class Euler24 {
 			/* We'll placed unused digits one at a time according to the factorial base. */
 			boolean[] used = new boolean[13];
 			int[] fBase = bracket(n);
-			//for (int i: fBase) System.out.println(i);
 			int[] ans = new int[13];
 			for (int i = 0; i < 13; i++) {
 				int numLess = 0;

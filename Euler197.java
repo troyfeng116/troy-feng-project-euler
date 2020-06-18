@@ -10,7 +10,8 @@ import java.util.*;
 public class Euler197 {
 	
 	/* The sequence converges for any finite b and u_0. So to satisfy the given absolute error, we need only find
-	 * the first many terms, not the 10^12'th term. */
+	 * the first 1000 terms, around which point the definition of sequence convergence holds for epsilon = 10^{-8},
+     * not the 10^12'th term. */
 	
 	public static double recurse(double b, double n, int term, int stop) {
         if (term >= stop) return n;

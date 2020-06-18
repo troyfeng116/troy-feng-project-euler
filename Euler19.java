@@ -42,16 +42,13 @@ public class Euler19 {
 	 * 
 	 * Equiv: D + floor(13(m+1)/5) + Y + floor(Y/4) - floor(Y/100) + floor(Y/400) all mod 7 */
 	
+	/* Implement Zeller's Congruence and return true if M/D/Y is a Sunday. */
 	public static boolean zeller(int d, int m, long y) {
-		//long k = y % 100;
-		//long j = y/100;
 		if (m <= 2) {
 			m += 12;
 			y--;
 		}
-		//long dayOfWeek = (d + (13 * (m+1) / 5) + k + k/4 + j/4 + 5*j) % 7;
 		long dayOfWeek = (d + (13 * (m+1) / 5) + y + y/4 - y/100 + y/400) % 7;
-		//System.out.println(dayOfWeek);
 		return dayOfWeek == 1;
 	}
 	
@@ -66,7 +63,6 @@ public class Euler19 {
 			String[] dateInput2 = s.nextLine().split(" ");
 			long y2 = Long.parseLong(dateInput2[0]);
 			int m2 = Integer.parseInt(dateInput2[1]);
-			//int d2 = Integer.parseInt(dateInput2[2]);
 			
 			int ans = 0;
 			

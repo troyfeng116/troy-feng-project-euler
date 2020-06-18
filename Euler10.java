@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Euler10 {
 	
-	/* Hashmap? Possibly between k and k'th prime.
+	/* Thoughts/approach: Hashmap? Possibly between k and k'th prime.
 	 * 
 	 * For each new prime, sum increases. Bracket by prime?
 	 * 

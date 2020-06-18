@@ -72,7 +72,6 @@ public class Euler25 {
 	/* Calculate k'th Fibonacci number, with memoization. Assumes that fib table contains fib(k-1) and
 	 * fib(k-2). */
 	public static int[] fibonacci(int k) {
-		//if (fib.containsKey(k)) return fib.get(k);
 		int[] ans = add(fib.get(k-1), fib.get(k-2));
 		fib.put(k,ans);
 		/* If fib_k length > fib_{k-1} and fib_{k-2} length, add to nDigits table (must be first k with that
@@ -95,18 +94,6 @@ public class Euler25 {
 			if (fibonacci(k).length > length) length = fibonacci(k).length;
 			k++;
 		}
-		//System.out.println("done");
-		
-		/*for (int i = 1; i < 100; i++) {
-			System.out.print("i = " + i + ": ");
-			for (int j = 0; j < fib.get(i).length; j++) {
-				System.out.print(fib.get(i)[fib.get(i).length - 1 - j]);
-			}
-			System.out.print(" ");
-			System.out.print(nDigits.get(i).intValue());
-			System.out.println();
-		}
-		System.exit(0);*/
 		
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());

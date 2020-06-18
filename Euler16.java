@@ -14,9 +14,10 @@ public class Euler16 {
 	/* Notes/approach: Obviously can't compute directly with anything... right?
 	 * 
 	 * BigInteger would work, but once again, cheap. (plus java.math isn't included in given packages)
+	 * I wrote the BigInteger solution but commented it out.
 	 * 
 	 * A less cheap way is to represent the powers of two as arrays and write a function to double the
-	 * array representation of a number. */
+	 * array representation of a number. This approach is not commented. */
 	
 	static int[][] powers;
 	
@@ -68,15 +69,6 @@ public class Euler16 {
 			System.out.println(sum);*/
 			
 			int n = Integer.parseInt(s.nextLine());
-			/*int[] digits = new int[] {1};
-			int pow = 0;
-			while (pow < n) {
-				digits = doub(digits);
-				pow++;
-			}
-			int ans = 0;
-			for (int digit: digits) ans += digit;
-			System.out.println(ans);*/
 			int[] res = powers[n];
 			int ans = 0;
 			for (int digit: res) ans += digit;

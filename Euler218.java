@@ -15,9 +15,9 @@
  * 		it is a perfect right angled triangle and
  * 		its area is a multiple of the perfect numbers 6 and 28.
  * 
- * How many perfect right-angled triangles with c <= n exist that are not super-perfect? */
-
-/* Input given as 1<=q<=100000, 25<=n<=2*10^18 */
+ * How many perfect right-angled triangles with c <= n exist that are not super-perfect? 
+ *
+ * INPUT: 1 <= q <= 100000, 25 <= n <= 2*10^18 */
 
 import java.util.*;
 

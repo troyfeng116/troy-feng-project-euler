@@ -126,16 +126,6 @@ public class Euler20 {
 	}
 	
 	public static void main(String[] args) {
-		/*int[] test = new int[] {1,2,3,4,4};
-		int[] test2 = new int[] {9,9,9,3};
-		for (int i: multiplyOneDigit(test, 4)) System.out.print(i);
-		System.out.println();
-		for (int i: add(test, test2)) System.out.print(i);
-		System.out.println();
-		for (int i: multiply(test, 42)) System.out.print(i);
-		System.out.println();
-		System.exit(0);*/
-		
 		table = new int[N_MAX+1][];
 		table[0] = new int[] {1};
 		for (int i = 1; i <= N_MAX; i++) {
@@ -149,10 +139,8 @@ public class Euler20 {
 			int[] digits = factorial(n);
 			int sum = 0;
 			for (int i = 0; i < digits.length; i++) {
-				System.out.print(digits[digits.length-i-1]);
 				sum += digits[i];
 			}
-			System.out.println();
 			System.out.println(sum);
 		}
 		s.close();

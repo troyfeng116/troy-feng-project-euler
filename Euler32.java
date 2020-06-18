@@ -72,7 +72,6 @@ public class Euler32 {
 		for (int i = cut1+cut2; i < p.length; i++) {
 			n3 = n3 * 10 + p[i];
 		}
-		if (n1 * n2 == n3) System.out.println("FOUND: " + n1 + " x " + n2 + " = " + n3);
 		return n1 * n2 == n3? n3 : -1;
 		
 	}
@@ -106,7 +105,6 @@ public class Euler32 {
 		}
 		ans += count(p);
 		while (nextPermutation(p)) {
-			//System.out.println("looped");
 			ans += count(p);
 		}
 		System.out.println(ans);

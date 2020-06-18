@@ -18,7 +18,6 @@ public class Euler8 {
 		for (int j = 0; j < k; j++) {
 			product *= (n.charAt(j) - 48);
 		}
-		//System.out.println("First k: " + product);
 		int ans = product;
 		/* Check product from i to i+k-1, inclusive. */
 		for (int i = 1; i+k-1 < n.length(); i++) {
@@ -34,13 +33,11 @@ public class Euler8 {
 		int t = Integer.parseInt(s.nextLine());
 		for (int i = 0; i < t; i++) {
 			String[] inputs = s.nextLine().split(" ");
-			//int n = Integer.parseInt(inputs[0]);
 			int k = Integer.parseInt(inputs[1]);
 			String numInput = s.nextLine();
 			String[] subNumbers = numInput.split("0");
 			int ans = 0;
 			for (String sub: subNumbers) {
-				//System.out.println(sub);
 				if (sub.length() < k) ;
 				else {
 					ans = Math.max(findMax(sub,k), ans);

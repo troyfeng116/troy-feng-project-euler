@@ -5,10 +5,13 @@
  * difficult, puzzle idea called Latin Squares. The objective of Su Doku puzzles, however, is to 
  * replace the blanks (or zeros) in a 9 by 9 grid in such that each row, column, and 3 by 3 box contains 
  * each of the digits 1 to 9. Below is an example of a typical starting puzzle grid and its solution 
- * grid. */
-
-/* You are given a number of Su Doku. All of them could be solved without guessing and even backtracking. 
- * Surely, you may write every solution that passes tests and fits into constraints. */
+ * grid.
+ *
+ * You are given a number of Su Doku. All of them could be solved without guessing and even backtracking. 
+ * Surely, you may write every solution that passes tests and fits into constraints. 
+ *
+ * INPUT FORMAT: 9 lines each containg 9 characters '0'-'9'. '0' means that the place is empty otherwise 
+ * the place contains corresponding digit.*/
 
 import java.util.Scanner;
 

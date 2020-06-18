@@ -41,7 +41,6 @@ public class Euler30 {
 			sum += Math.pow(copy%10, n);
 			copy /= 10;
 		}
-		//System.out.println(sum);
 		return sum == num;
 	}
 	

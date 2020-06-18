@@ -20,9 +20,9 @@ import java.util.Scanner;
 
 public class Euler28 {
 	
-	/* Thoughts/approach: Definitely DP. Might be closed form?
+	/* Thoughts/approach: Possibly DP. Might be closed form since 10^18 is so big?
 	 * 
-	 * After playing around, it turns out the top-left index of each NxN square is N^2 (working it out
+	 * EDUT: after playing around, it turns out the top-left index of each NxN square is N^2 (working it out
 	 * adds to something like 4N^2 - 4N + 1 which is cool). Then, the three other corners are evenly
 	 * spaced by N-1.
 	 * 

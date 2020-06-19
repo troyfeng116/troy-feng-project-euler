@@ -12,7 +12,7 @@
 
 import java.util.Scanner;
 
-public class Euler24 {
+public class Euler024 {
 	
 	/* Permutation generation might work, but 13! is larger than max int, so array memoization won't work and
 	 * Lists are less efficient. Would take a long time...

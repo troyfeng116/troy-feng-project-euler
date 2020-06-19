@@ -9,7 +9,7 @@
 //import java.math.BigInteger;
 import java.util.Scanner;
 
-public class Euler16 {
+public class Euler016 {
 	
 	/* Notes/approach: Obviously can't compute directly with anything... right?
 	 * 

@@ -15,7 +15,7 @@
 
 import java.util.Scanner;
 
-public class Euler31 {
+public class Euler031 {
 	
 	/* Thoughts/approach: Classic ways to make change problem. */
 	

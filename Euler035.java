@@ -14,7 +14,7 @@
 
 import java.util.Scanner;
 
-public class Euler35 {
+public class Euler035 {
 	
 	/* Thoughts/approach: sieve up to 10^7, since rotations can exceed MAX_N.
 	 * 

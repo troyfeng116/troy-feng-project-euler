@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Euler12 {
+public class Euler012 {
 	
 	/* Notes/approach: 
 	 * 		k'th triangular number is k(k+1)/2.

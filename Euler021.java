@@ -13,7 +13,7 @@
 
 import java.util.Scanner;
 
-public class Euler21 {
+public class Euler021 {
 	
 	/* Thoughts/approach: if we know prime factorization of N, finding sum of factors is straightforward.
 	 * 

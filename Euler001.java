@@ -9,7 +9,7 @@
 
 import java.util.Scanner;
 
-public class Euler1 {
+public class Euler001 {
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int nTests = Integer.parseInt(s.nextLine());

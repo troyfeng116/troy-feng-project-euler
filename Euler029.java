@@ -20,7 +20,7 @@
 
 import java.util.Scanner;
 
-public class Euler29 {
+public class Euler029 {
 	
 	/* Thoughts/approach: Start with (N-1)^2 (all possible pairs of a^b). Then loop from 2 to N,
 	 * subtracting all duplicates.

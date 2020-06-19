@@ -28,7 +28,7 @@
 
 import java.util.Scanner;
 
-public class Euler19 {
+public class Euler019 {
 	
 	/* Thoughts/approach: I HATE CALENDAR PROBLEMS >:(
 	 * 

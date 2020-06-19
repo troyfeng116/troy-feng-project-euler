@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Euler25 {
+public class Euler025 {
 	
 	/* Thoughts/approach: Use O(n) Fibonacci generation. And use arrays, not BigInteger, to make
 	 * the problem somewhat interesting. Since calculation is O(max given N), precalculating isn't

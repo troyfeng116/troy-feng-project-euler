@@ -10,7 +10,7 @@
 
 import java.util.Scanner;
 
-public class Euler36 {
+public class Euler036 {
 	
 	/* Thoughts/approach: One potentially useful observation is that a number that ends in zero can't
 	 * be a palindrome (because of the no leading zeroes condition). So, we can skip all numbers that

@@ -15,7 +15,7 @@
 
 import java.util.Scanner;
 
-public class Euler32 {
+public class Euler032 {
 	
 	/* Thoughts/approach: Generate all permutations of 1-N, and then test all ways to split up each permutation
 	 * into three pieces and see if the multiplication is true...? We can avoid checking some partitions of each

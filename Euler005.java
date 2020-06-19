@@ -9,9 +9,9 @@
 
 import java.util.Scanner;
 
-public class Euler5 {
+public class Euler005 {
 	
-	/* Approach: for each integer i leq N, check if gcd(i,N) == i. If not, multiply by i/gcd. Else continue. */
+	/* Approach: for each integer i <= N, check if gcd(i,N) == i. If not, multiply by i/gcd. Else continue. */
 	
 	public static int gcd(int a, int b) {
 		if (a == 0) return b;

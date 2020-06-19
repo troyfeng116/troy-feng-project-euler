@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Euler7 {
+public class Euler007 {
 	
 	static Map<Integer,Integer> table;
 	

@@ -11,7 +11,7 @@
 
 import java.util.Scanner;
 
-public class Euler4 {
+public class Euler004 {
 	
 	/* NOTES/APPROACH:
 	 * 

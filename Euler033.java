@@ -20,7 +20,7 @@
 
 import java.util.Scanner;
 
-public class Euler33 {
+public class Euler033 {
 	
 	/* Thoughts/approach: We represent 2-digit integer ab as 10a+b. So to get from ab to a ("cancel" b), we
 	 * subtract 9a+b from ab. And to "cancel" a, we subtract 10a (or ab/10).

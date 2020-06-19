@@ -10,7 +10,7 @@
 
 import java.util.Scanner;
 
-public class Euler20 {
+public class Euler020 {
 	
 	/* Thoughts/approach: BigInteger would probably work...
 	 * 

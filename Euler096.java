@@ -15,7 +15,7 @@
 
 import java.util.Scanner;
 
-public class Euler96 {
+public class Euler096 {
 	
 	/* Approach: backtracking. */
 	

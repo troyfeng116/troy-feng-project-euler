@@ -15,7 +15,7 @@
 
 import java.util.Scanner;
 
-public class Euler22 {
+public class Euler022 {
 	
 	/* Approach: quicksort first. Then binary search and find score, I guess. */
 	

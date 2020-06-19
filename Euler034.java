@@ -10,7 +10,7 @@
 
 import java.util.Scanner;
 
-public class Euler34 {
+public class Euler034 {
 	
 	/* Thoughts/approach: brute force I suppose. Memoize the factorials first. */
 	

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Euler17 {
+public class Euler017 {
 	
 	/* Thoughts/approach: hash 1-20, 30-90, 100, then 10^3, 10^6, 10^9.
 	 * 

@@ -7,7 +7,7 @@
 
 import java.util.Scanner;
 
-public class Euler11 {
+public class Euler011 {
 	
 	/* Brute force: not that many to try right...? 16*20 up/down to check, 16*20 L/R to check, 
 	 * 1+2+...+16+15+...+1 times two diagonal to check. */

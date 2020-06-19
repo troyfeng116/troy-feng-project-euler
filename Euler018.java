@@ -16,7 +16,7 @@
 
 import java.util.Scanner;
 
-public class Euler18 {
+public class Euler018 {
 	
 	/* Pascal's Triangle-esque. Track max sum in each spot as we go. Jagged array to store. */
 	

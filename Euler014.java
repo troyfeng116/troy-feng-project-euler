@@ -19,7 +19,7 @@
 
 import java.util.Scanner;
 
-public class Euler14 {
+public class Euler014 {
 	
 	/* Idea: memoize length of sequence for each N? So map stores <k,v>, where k is integer <= 5x10^6 and v is length
 	 * of Collatz sequence starting from k. 

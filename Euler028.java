@@ -18,7 +18,7 @@
 
 import java.util.Scanner;
 
-public class Euler28 {
+public class Euler028 {
 	
 	/* Thoughts/approach: Possibly DP. Might be closed form since 10^18 is so big?
 	 * 

@@ -19,7 +19,7 @@
 
 import java.util.Scanner;
 
-public class Euler23 {
+public class Euler023 {
 	
 	/* Thoughts/approach: Modified Sieve of Eratosthenes to find sums of proper divisors.
 	 * 

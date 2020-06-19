@@ -9,7 +9,7 @@
 
 import java.util.Scanner;
 
-public class Euler15 {
+public class Euler015 {
 	
 	/* Initial thoughts/approach: Pascal's triangle?
 	 * 

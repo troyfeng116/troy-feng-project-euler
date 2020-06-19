@@ -14,7 +14,7 @@
  * INPUT: 1 <= T,N <= 3000, */
 
 import java.util.Scanner;
-public class Euler9 {
+public class Euler009 {
 	
 	/* Notes/observations:
 	 * 

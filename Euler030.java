@@ -16,7 +16,7 @@
 
 import java.util.Scanner;
 
-public class Euler30 {
+public class Euler030 {
 	
 	/* Thoughts/approach:
 	 * 

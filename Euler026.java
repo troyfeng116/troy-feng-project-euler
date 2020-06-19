@@ -23,7 +23,7 @@
 
 import java.util.Scanner;
 
-public class Euler26 {
+public class Euler026 {
 	
 	/* Thoughts/approach: First, once a single digit repeats, the cycle restarts. So the biggest possible cycle
 	 * (if it even exists) would be 10. EDIT: Never mind lol.

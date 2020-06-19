@@ -6,7 +6,7 @@
 
 import java.util.Scanner;
 
-public class Euler8 {
+public class Euler008 {
 	
 	/* Naive approach: for each substring of length K, compare product against max. Worst case 70000 compares... 
 	 * 

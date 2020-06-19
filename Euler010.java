@@ -8,7 +8,7 @@
 
 import java.util.Scanner;
 
-public class Euler10 {
+public class Euler010 {
 	
 	/* Thoughts/approach: Hashmap? Possibly between k and k'th prime.
 	 * 

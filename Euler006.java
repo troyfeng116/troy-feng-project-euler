@@ -12,7 +12,7 @@
 import java.math.BigInteger;
 import java.util.Scanner;
 
-public class Euler6 {
+public class Euler006 {
 	
 	/* Approach (easy): use sum of squares formula and Gauss's formula. 
 	 * 
@@ -28,7 +28,7 @@ public class Euler6 {
 	}
 	
 	
-	/* Less cheap but much slower approach. Use half of pyramid of all combos (i,j) where 1 <=i,j <= N. */
+	/* Less cheap but slower approach. Use half of pyramid of all combos (i,j) where 1 <=i,j <= N. */
 	public static BigInteger diff2(BigInteger n) {
 		BigInteger ans = BigInteger.ZERO;
 		BigInteger twoConst = BigInteger.ONE.add(BigInteger.ONE);
@@ -46,7 +46,7 @@ public class Euler6 {
 			String input = s.nextLine();
 			BigInteger n = new BigInteger(input);
 			System.out.println(diff1(n));
-			System.out.println(diff2(n));
+			//System.out.println(diff2(n));
 		}
 		s.close();
 	}

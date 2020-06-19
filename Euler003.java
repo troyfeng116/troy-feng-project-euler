@@ -8,7 +8,7 @@
 
 import java.util.Scanner;
 
-public class Euler3 {
+public class Euler003 {
 	
 	/* If n is prime, returns n. Else returns a prime factor of n. Assumes n%2 != 0 and n%3 != 0. */
 	public static long isPrime(long n, long start) {

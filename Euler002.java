@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Euler2 {
+public class Euler002 {
 	
 	/* Fibonacci DP. Hashmap fib stores K,V, where K is term and V is value of K'th term. 
 	 * 

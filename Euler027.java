@@ -30,7 +30,7 @@
 
 import java.util.Scanner;
 
-public class Euler27 {
+public class Euler027 {
 	
 	/* Thoughts/approach: We have to test combinations of a and b where |a| <= N && |b| <= N such that:
 	 * 

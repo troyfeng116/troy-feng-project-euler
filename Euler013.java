@@ -7,7 +7,7 @@
 //import java.math.BigInteger;
 import java.util.Scanner;
 
-public class Euler13 {
+public class Euler013 {
 	
 	/* Cheap approach: BigInteger, right? 
 	 * 

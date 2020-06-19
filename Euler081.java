@@ -4,9 +4,9 @@
  *
  * INPUTS: 1 <= N <= 1000, 1 <= entries <= 10^9 */
 
-import java.util.*;
+import java.util.Scanner;
 	
-public class Euler81 {
+public class Euler081 {
 	
 /* Approach: Dynamic programming with one O(n^2) pass. */
 	

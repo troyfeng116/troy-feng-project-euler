@@ -55,7 +55,9 @@ public class Euler033 {
 
 	
 	static int[] tenToThe;
-		
+	static int nSum;
+	static int dSum;
+	
 	public static int gcd(int a, int b) {
 		if (a == b) return a;
 		if (a == 0) return b;
@@ -75,12 +77,22 @@ public class Euler033 {
 		System.out.println();
 		
 		for (int n1: toCheck) {
-			if (n1 >= 0) {
-				int denom = findDenom(num, n1, n);
-				if (denom > 0) {
-					System.out.println("FOUND " + num + "  " + denom);
-					ans += num+denom;
+			if (n1 < 0) continue;
+			int gcd = gcd(n1,num);
+			int r1 = n1/gcd;
+			int r = num/gcd;
+			int d1 = n1 + r1;
+			int d = num+r;
+			while (d < tenToThe[n]) {
+				System.out.println("CURRENT ITERATION: " + d1 + " / " + d);
+				if (containsDigits(d,d1,num,n1)) {
+					System.out.println("FOUND " + d + " for n=" + num + " and n1=" + n1);
+					dSum += d;
+					nSum += num;
+					ans++;
 				}
+				d1 += r1;
+				d += r;
 			}
 		}
 		return ans;
@@ -91,31 +103,31 @@ public class Euler033 {
 	 * an equivalent fraction, return denominator. Num is the numerator, num1 is (n-k) digits of
 	 * numerator, and n is number of digits in numerator. Find GCD, reduce, and check all multiples
 	 * d1/d of reduced n1/n such that d contains the digits of n that aren't in n1. */
-	public static int findDenom(int num, int num1, int n) {
-		System.out.println("---- FINDDENOM ----");
+	/*public static int findDenom(int num, int num1, int n) {
 		
 		int gcd = gcd(num1, num);
-		/* Iterate reduced n1 and n. */
 		int r1 = num1/gcd;
 		int r = num/gcd;
 		int d1 = num1+r1;
 		int d = num+r;
+		int ans = 0;
 		
 		while (d < tenToThe[n]) {
 			System.out.println("CURRENT ITERATION: " + d1 + " / " + d);
 			if (containsDigits(d,d1,num,num1)) {
 				System.out.println("FOUND " + d + " for n=" + num + " and n1=" + num1);
-				return d;
+				ans++;
 			}
 			d1 += r1;
 			d += r;
 		}
-		return 0;
-	}
+		return ans;
+	}*/
 	
-	/* Return true if d contains the digits of n not in n1 and d1 has rest of digits. */
+	/* Return true if d contains the digits of n not in n1 and d1 has rest of digits, in order. Return
+	 * d with those digits common with n not in n1 cancelled. */
 	public static boolean containsDigits(int d, int d1, int n, int n1) {
-		System.out.println("---- CONTAINSDIGITS ---- with n=" + n + " n1="+n1+" d="+d+" d1="+d1);
+		//System.out.println("---- CONTAINSDIGITS ---- with n=" + n + " n1="+n1+" d="+d+" d1="+d1);
 		
 		/* Find digits of n1 not in n. (recall digits in n1 appear in same order as n)
 		 * For each digit of n1 not in n, check if digit is in d. */
@@ -134,11 +146,11 @@ public class Euler033 {
 			missingDigits[s1.charAt(j)-48]++;
 			j++;
 		}
-		
+		/*
 		System.out.print("MISSING DIGITS BETWEEN N AND N1: ");
 		for (int i: missingDigits) System.out.print(i + " ");
 		System.out.println();
-		
+		*/
 		if (missingDigits[0] > 0) return false; // Can't cancel 0.
 		
 		String s3 = Integer.toString(d);
@@ -152,26 +164,26 @@ public class Euler033 {
 				dDigits[s3.charAt(i) - 48]--;
 			}
 		}
-		
+		/*
 		System.out.print("MISSING DIGITS AFTER CHECKING D: ");
 		for (int i: missingDigits) System.out.print(i + " ");
 		System.out.println();
-		
+		*/
 		String s4 = Integer.toString(d1);
 		for (int i = 0; i < s4.length(); i++) {
 			dDigits[s4.charAt(i)-48]--;
 		}
 		for (int i = 0; i < 10; i++) {
 			if (missingDigits[i] > 0) {
-				System.out.println(d + " does not contain missing digits between " + n + " and " + n1);
+				//System.out.println(d + " does not contain missing digits between " + n + " and " + n1);
 				return false;
 			}
 			if (dDigits[i] > 0) {
-				System.out.println("Invalid d1=" + d1 + " for n="+ n + ", d=" + d);
+				//System.out.println("Invalid d1=" + d1 + " for n="+ n + ", d=" + d);
 				return false;
 			}
 		}
-		System.out.println(d + " contains missing digits between " + n + " and " + n1 + " AND " + d1 + " contains rest of d");
+		//System.out.println(d + " contains missing digits between " + n + " and " + n1 + " AND " + d1 + " contains rest of d");
 		return true;
 	}
 
@@ -184,6 +196,7 @@ public class Euler033 {
 			int a = num/10;
 			int b = num%10;
 			if (b == 0) return new int[] {};
+			if (a == b) return new int[] {a};
 			return new int[] {a,b};
 		}
 		if (n == 3) {
@@ -194,10 +207,16 @@ public class Euler033 {
 				if (b == 0 && c == 0) return new int[] {};
 				if (b == 0) return new int[] {10*a+c};
 				if (c == 0) return new int[] {10*a+b};
+				if (a == b && b == c) return new int[] {10*a+b};
+				if (a == b || a == c) return new int[] {10*a+b, 10*a+c};
+				if (b == c) return new int[] {10*a+b, 10*b+c};
 				return new int[] {10*a+b, 10*a+c, 10*b+c};
 			}
 			if (k == 2) {
 				if (b == 0 || c == 0) return new int[] {};
+				if (a == b && b == c) return new int[] {a};
+				if (a == b || b == c) return new int[] {a,c};
+				if (b == c) return new int[] {a,b};
 				return new int[] {a, b, c};
 			}
 		}
@@ -248,14 +267,15 @@ public class Euler033 {
 	
 	
 	public static void main(String[] args) {
+		nSum = 0;
+		dSum = 0;
 		tenToThe = new int[6];
 		tenToThe[0] = 1;
 		for (int i = 1; i <= 5; i++) {
 			tenToThe[i] = tenToThe[i-1] * 10;
 		}
 		
-		System.out.println(findCurious(49,2,1));
-		System.out.println(findCurious(398,3,1));
+		System.out.println(findCurious(925,3,1));
 		System.exit(0);
 		
 		// 4 3 -> 255983 467405
@@ -264,18 +284,25 @@ public class Euler033 {
 		String[] inputs = s.nextLine().split(" ");
 		int n = Integer.parseInt(inputs[0]);
 		int k = Integer.parseInt(inputs[1]);
-		int nSum = 0;
-		int dSum = 0;
+		//int nSum = 0;
+		//int dSum = 0;
 		for (int numerator = tenToThe[n-1]; numerator < tenToThe[n]; numerator++) {
-			int denom = findCurious(numerator, n, k);
-			if (denom > 0) {
+			findCurious(numerator, n, k);
+			/*if (denom > 0) {
 				dSum += denom;
 				nSum += numerator;
-			}
+			}*/
 		}
 		System.out.println(nSum + " " + dSum);
 		s.close();
 	}
+	
+	
+	
+
+	
+	
+	
 	
 	
 	
@@ -480,7 +507,3 @@ public class Euler033 {
 		s.close();
 	} */
 }
-
-
-
-

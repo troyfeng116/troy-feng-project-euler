@@ -54,9 +54,9 @@ public class Euler033 {
 	
 
 	
+	/* FIRST ATTEMPT: WORKS for N=2 and N=3 but times out for N=4. */
+
 	static int[] tenToThe;
-	static int nSum;
-	static int dSum;
 	
 	public static int gcd(int a, int b) {
 		if (a == b) return a;
@@ -64,253 +64,6 @@ public class Euler033 {
 		if (b == 0) return a;
 		return gcd(b, a%b);
 	}
-	
-	/* Return sums of numerator+denominator s.t. that numerator cancels with denominator. */
-	public static int findCurious(int num, int n, int k) {
-		System.out.println("-------- FINDCURIOUS -------- : numerator=" + num);
-		
-		int[] toCheck = generateCombs(num, n, k);
-		int ans = 0;
-		
-		System.out.print("ToCheck: ");
-		for (int i: toCheck) System.out.print(i + " ");
-		System.out.println();
-		
-		for (int n1: toCheck) {
-			if (n1 < 0) continue;
-			int gcd = gcd(n1,num);
-			int r1 = n1/gcd;
-			int r = num/gcd;
-			int d1 = n1 + r1;
-			int d = num+r;
-			while (d < tenToThe[n]) {
-				System.out.println("CURRENT ITERATION: " + d1 + " / " + d);
-				if (containsDigits(d,d1,num,n1)) {
-					System.out.println("FOUND " + d + " for n=" + num + " and n1=" + n1);
-					dSum += d;
-					nSum += num;
-					ans++;
-				}
-				d1 += r1;
-				d += r;
-			}
-		}
-		return ans;
-	}
-	
-	
-	/* If there is a denominator with n digits that "cancels" k digits with numerator to form
-	 * an equivalent fraction, return denominator. Num is the numerator, num1 is (n-k) digits of
-	 * numerator, and n is number of digits in numerator. Find GCD, reduce, and check all multiples
-	 * d1/d of reduced n1/n such that d contains the digits of n that aren't in n1. */
-	/*public static int findDenom(int num, int num1, int n) {
-		
-		int gcd = gcd(num1, num);
-		int r1 = num1/gcd;
-		int r = num/gcd;
-		int d1 = num1+r1;
-		int d = num+r;
-		int ans = 0;
-		
-		while (d < tenToThe[n]) {
-			System.out.println("CURRENT ITERATION: " + d1 + " / " + d);
-			if (containsDigits(d,d1,num,num1)) {
-				System.out.println("FOUND " + d + " for n=" + num + " and n1=" + num1);
-				ans++;
-			}
-			d1 += r1;
-			d += r;
-		}
-		return ans;
-	}*/
-	
-	/* Return true if d contains the digits of n not in n1 and d1 has rest of digits, in order. Return
-	 * d with those digits common with n not in n1 cancelled. */
-	public static boolean containsDigits(int d, int d1, int n, int n1) {
-		//System.out.println("---- CONTAINSDIGITS ---- with n=" + n + " n1="+n1+" d="+d+" d1="+d1);
-		
-		/* Find digits of n1 not in n. (recall digits in n1 appear in same order as n)
-		 * For each digit of n1 not in n, check if digit is in d. */
-		String s1 = Integer.toString(n);
-		String s2 = Integer.toString(n1);
-		int[] missingDigits = new int[10]; // Count of each missing digit between n and n1.
-		int j = 0;
-		for (int i = 0; i < s2.length(); i++) {
-			while (s2.charAt(i) != s1.charAt(j)) {
-				missingDigits[s1.charAt(j)-48]++;
-				j++;
-			}
-			j++;
-		}
-		while (j < s1.length()) {
-			missingDigits[s1.charAt(j)-48]++;
-			j++;
-		}
-		/*
-		System.out.print("MISSING DIGITS BETWEEN N AND N1: ");
-		for (int i: missingDigits) System.out.print(i + " ");
-		System.out.println();
-		*/
-		if (missingDigits[0] > 0) return false; // Can't cancel 0.
-		
-		String s3 = Integer.toString(d);
-		int[] dDigits = new int[10];
-		for (int i = 0; i < s3.length(); i++) {
-			dDigits[s3.charAt(i)-48]++;
-		}
-		for (int i = 0; i < s3.length(); i++) {
-			if (missingDigits[s3.charAt(i) - 48] > 0) {
-				missingDigits[s3.charAt(i) - 48]--;
-				dDigits[s3.charAt(i) - 48]--;
-			}
-		}
-		/*
-		System.out.print("MISSING DIGITS AFTER CHECKING D: ");
-		for (int i: missingDigits) System.out.print(i + " ");
-		System.out.println();
-		*/
-		String s4 = Integer.toString(d1);
-		for (int i = 0; i < s4.length(); i++) {
-			dDigits[s4.charAt(i)-48]--;
-		}
-		for (int i = 0; i < 10; i++) {
-			if (missingDigits[i] > 0) {
-				//System.out.println(d + " does not contain missing digits between " + n + " and " + n1);
-				return false;
-			}
-			if (dDigits[i] > 0) {
-				//System.out.println("Invalid d1=" + d1 + " for n="+ n + ", d=" + d);
-				return false;
-			}
-		}
-		//System.out.println(d + " contains missing digits between " + n + " and " + n1 + " AND " + d1 + " contains rest of d");
-		return true;
-	}
-
-	
-	/* Return array of numbers, each corresponding to a unique way to remove k digits from num,
-	 * which has n digits. Doesn't remove zeroes. */
-	public static int[] generateCombs(int num, int n, int k) {
-		//System.out.println("-------- GENERATECOMBS --------");
-		if (n == 2) {
-			int a = num/10;
-			int b = num%10;
-			if (b == 0) return new int[] {};
-			if (a == b) return new int[] {a};
-			return new int[] {a,b};
-		}
-		if (n == 3) {
-			int a = num/100;
-			int b = (num%100)/10;
-			int c = num % 10;
-			if (k == 1) {
-				if (b == 0 && c == 0) return new int[] {};
-				if (b == 0) return new int[] {10*a+c};
-				if (c == 0) return new int[] {10*a+b};
-				if (a == b && b == c) return new int[] {10*a+b};
-				if (a == b || a == c) return new int[] {10*a+b, 10*a+c};
-				if (b == c) return new int[] {10*a+b, 10*b+c};
-				return new int[] {10*a+b, 10*a+c, 10*b+c};
-			}
-			if (k == 2) {
-				if (b == 0 || c == 0) return new int[] {};
-				if (a == b && b == c) return new int[] {a};
-				if (a == b || b == c) return new int[] {a,c};
-				if (b == c) return new int[] {a,b};
-				return new int[] {a, b, c};
-			}
-		}
-		if (n == 4) {
-			int a = num/1000;
-			int b = (num%1000)/100;
-			int c = (num%100)/10;
-			int d = num%10;
-			if (k == 1) {
-				int[] result = new int[4];
-				result[0] = 100*a + 10*b + c;
-				result[1] = 100*a + 10*b + d;
-				result[2] = 100*a + 10*c + d;
-				result[3] = 100*b + 10*c + d;
-				if (b == 0) result[2] = -1;
-				if (c == 0) result[1] = -1;
-				if (d == 0) result[0] = -1;
-				return result;
-			}
-			if (k == 2) {
-				int[] result = new int[6];
-				result[0] = 10*a + b;
-				result[1] = 10*a + c;
-				result[2] = 10*a + d;
-				result[3] = 10*b + c;
-				result[4] = 10*b + d;
-				result[5] = 10*c + d;
-				if (b == 0) result[1] = result[2] = result[5] = -1;
-				if (c == 0) result[0] = result[2] = result[4] = -1;
-				if (d == 0) result[0] = result[1] = result[3] = -1;
-				return result;
-			}
-			if (k == 3) {
-				int[] result = new int[4];
-				result[0] = a;
-				result[1] = b;
-				result[2] = c;
-				result[3] = d;
-				if (b == 0) result[1] = -1;
-				if (c == 0) result[2] = -1;
-				if (d == 0) result[3] = -1;
-				return result;
-			}
-		}
-		
-		return new int[] {};
-	}
-	
-	
-	public static void main(String[] args) {
-		nSum = 0;
-		dSum = 0;
-		tenToThe = new int[6];
-		tenToThe[0] = 1;
-		for (int i = 1; i <= 5; i++) {
-			tenToThe[i] = tenToThe[i-1] * 10;
-		}
-		
-		System.out.println(findCurious(925,3,1));
-		System.exit(0);
-		
-		// 4 3 -> 255983 467405
-		
-		Scanner s = new Scanner(System.in);
-		String[] inputs = s.nextLine().split(" ");
-		int n = Integer.parseInt(inputs[0]);
-		int k = Integer.parseInt(inputs[1]);
-		//int nSum = 0;
-		//int dSum = 0;
-		for (int numerator = tenToThe[n-1]; numerator < tenToThe[n]; numerator++) {
-			findCurious(numerator, n, k);
-			/*if (denom > 0) {
-				dSum += denom;
-				nSum += numerator;
-			}*/
-		}
-		System.out.println(nSum + " " + dSum);
-		s.close();
-	}
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-/* FIRST ATTEMPT: WORKS for N=2 and N=3 but times out for N=4. */
 	
 	public static boolean isCurious(int num, int denom, int n, int k) {
 		//System.out.println("-------- ISCURIOUS --------");
@@ -475,16 +228,16 @@ public class Euler033 {
 		return ans;
 	}
 	
-	/* public static void main(String[] args) {
+	public static void main(String[] args) {
 		tenToThe = new int[6];
 		tenToThe[0] = 1;
 		for (int i = 1; i <= 5; i++) {
 			tenToThe[i] = tenToThe[i-1] * 10;
 		}
-		
+		/*
 		System.out.println(isCurious(3016,6032,4,2));
 		System.exit(0);
-		
+		*/
 		// 4 3 -> 255983 467405
 		
 		Scanner s = new Scanner(System.in);
@@ -505,5 +258,5 @@ public class Euler033 {
 		}
 		System.out.println(nSum + " " + dSum);
 		s.close();
-	} */
+	}
 }

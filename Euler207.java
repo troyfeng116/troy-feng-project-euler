@@ -11,9 +11,9 @@
  * 
  * Thus P(6) = 1/2. 
  * 
- * Find the smallest m for which P(m) < a/b. */
-
-/* Input: q queries, a and b separated by space. 1 <= q <= 3x10^5, 1 <= a < b <= 10^18  */
+ * Find the smallest m for which P(m) < a/b.
+ * 
+ * INPUTS: q queries, a and b separated by space. 1 <= q <= 3x10^5, 1 <= a < b <= 10^18  */
 
 import java.math.BigInteger;
 import java.util.Scanner;
@@ -105,45 +105,4 @@ public class Euler207 {
         }
         s.close();
     }
-	
-	
-	
-	
-
-/* FIRST ATTEMPT: WORKED FOR VALUES THAT DIDN'T EXCEED LONG MAX. */
-	public static void FIRST_ATTEMPT() {
-        Scanner s = new Scanner(System.in);
-        int q = Integer.parseInt(s.nextLine());
-        for (int i = 0; i < q; i++) {
-            String[] inputs = s.nextLine().split(" ");
-            long a = Long.parseLong(inputs[0]);
-            long b = Long.parseLong(inputs[1]);
-            double cutoff = (a*1.0)/b;
-            System.out.println("Target: " + a + "/" + b + " = " + cutoff);
-            long t = 1; //Number of perfect partitions.
-            long pow2 = 2;
-            while (b * t >=  a * 2 * (pow2 - 1)) {
-                t++;
-                pow2 *= 2;
-            }
-            System.out.println("t = " + t);
-            //long start = (long) (t / cutoff);
-            //System.out.println("Start = " + start);
-            //long total = (long) Math.pow(2, t) - 1;
-            long start = (long) (t * b / a);
-            //System.out.println(start);
-            //long gate = (long) Math.pow(2,t+1);
-            //System.out.println("Total tested from " + start + " until " + gate);
-            while (t*b >= start*a) {
-                    //Double.compare((t+0.0)/start, cutoff) >= 0) {
-                start++;
-            }
-            System.out.println("Total found: " + start);
-            System.out.println((long) start * (start + 1));
-            System.out.println("Result: " + (t + 0.0)/start);
-            
-        }
-        s.close();
-	}
-
 }

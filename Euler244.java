@@ -173,57 +173,16 @@ public class Euler244 {
 							minimum = length+1;
 						}
 						int direction = getDirection(pos, i);
-						//int[] path = new int[length+1];
 						long pathSum = 0;
 						for (int p = 0; p < length; p++) {
 							pathSum = (pathSum * 243 + currentConfig[n*n+p]) % 100000007;
-							//path[p] = currentConfig[n*n+p];
 						}
 						
-						//path[length] = direction;
 						pathSum = (pathSum * 243 + direction) % 100000007;
 						sum += pathSum;
-						//paths.add(path);
-						//System.out.println("added path YES");
 					}
-		//P		
-					/*if (Arrays.equals(newConfig, target)) {
-						if (!found) {
-							found = true;
-							minimum = length+1;
-						}
-						int direction = getDirection(pos, i);
-						int[] path = new int[length+1];
-						for (int p = 0; p < length; p++)
-							path[p] = currentConfig[n*n+p];
-						path[length] = direction;
-						paths.add(path);
-						//System.out.println("added path YES");
-					}
-					else if (visited.contains(newConfig)) ;
-					else {
-						visited.add(newConfig);
-						int direction = getDirection(pos, i);
-						int[] full = new int[n*n + length + 1];
-						for (int x = 0; x < n*n; x++) {
-							full[x] = newConfig[x];
-						}
-						for (int x = n*n; x < currentConfig.length; x++)
-							full[x] = currentConfig[x];
-						full[currentConfig.length] = direction;*/
-		//P				
-						/*System.out.print("full after adding direction " + direction + ": ");
-						for (int p = 0; p < full.length; p++)
-							System.out.print(full[p] + " ");
-						System.out.println();*/
-						
-		//P				/*q.add(full);*/
-						
-						//System.out.println("added to queue");
-		//P			}
 				}
 			}
-			//break;
 		}
 	}
 	
@@ -255,8 +214,8 @@ public class Euler244 {
 		//for (int i: end) System.out.print(i + " ");
 		bfs(start,end);
 		
-		long ans = 0;
-		/*for (int i = 0; i < paths.size(); i++) {
+		/*long ans = 0;
+		for (int i = 0; i < paths.size(); i++) {
 			long checkSum = 0;
 			for (int j = 0; j < paths.get(i).length; j++) {
 				checkSum = (checkSum * 243 + paths.get(i)[j]) % 100000007;
@@ -265,9 +224,8 @@ public class Euler244 {
 			}
 			System.out.println();
 			ans += checkSum;
-		}*/
-		//if (found) System.out.println("FOUNDFUCKYES");
-		System.out.println(ans % 100000007);
+		}
+		System.out.println(ans % 100000007);*/
 		System.out.println(sum % 100000007);
 		s.close();
 	}

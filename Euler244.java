@@ -27,6 +27,8 @@ RRBB
 RBBB
 RWRB
 RRBB
+
+ * should return 91440058.
 */
 
 //import java.util.ArrayList;
@@ -55,13 +57,18 @@ public class Euler244 {
 	
 	static class Entry {
 		int[] config; /* Configuration of tiles. */
-		int[] path; /* Sequence of L|U|R|D to reach config. */
+		//int[] path; /* Sequence of L|U|R|D to reach config. */
+		int length;
+		int checkSum;
 		
-		public Entry(int[] config, int[] path) {
+		public Entry(int[] config, int length, int checkSum) {
 			this.config = config;
-			this.path = path;
+			this.length = length;
+			this.checkSum = checkSum;
 		}
 	}
+	
+	static final int MOD = 100000007;
 	
 	static Set<int[]> visited; // Track visited configs. No path after, just n*n visited configs.
 		
@@ -122,15 +129,13 @@ public class Euler244 {
 	 * In queue, stored are configs reached by unique paths. First n*n elements are the config. Following indices store the path. */
 	public static void bfs(int[] config, int[] target) {
 		Queue<Entry> q = new LinkedList<Entry>();
-		Entry first = new Entry(config, new int[] {});
+		Entry first = new Entry(config, 0, 0);
 		q.add(first);
 		while (!q.isEmpty()) {
 			Entry e = q.remove();
+			int length = e.length;
 			int[] currentConfig = e.config;
-			int[] currentPath = e.path;
-			int length = currentPath.length;
-			//System.out.println("length: " + length);
-			//System.out.println("minimum: " + minimum);
+			
 			if (length >= minimum) break;
 			int pos = indexOf(currentConfig, 87); /* ALERT: CAN REDUCE RUNTIME HERE */
 			int[] test = new int[] {pos-1, pos+1, pos-n, pos+n};
@@ -141,7 +146,7 @@ public class Euler244 {
 					/*int[] newConfig = new int[n*n];
 					for (int k = 0; k < n*n; k++)
 						newConfig[k] = currentConfig[k];*/
-					int[] newConfig = Arrays.copyOfRange(currentConfig, 0, n*n);
+					int[] newConfig = Arrays.copyOf(currentConfig, currentConfig.length);
 					
 					/*System.out.print("newConfig before swap: ");
 					for (int p = 0; p < n*n; p++)
@@ -151,8 +156,7 @@ public class Euler244 {
 					newConfig[pos] = newConfig[i];
 					newConfig[i] = (int) 'W';
 					int direction = getDirection(pos, i);
-					int[] newPath = Arrays.copyOf(currentPath, length+1);
-					newPath[length] = direction;
+					int newCheckSum = (int) ((((long) e.checkSum * 243) + direction) % MOD);
 					
 					/*System.out.print("newConfig after swap with " + i + ": ");
 					for (int p = 0; p < n*n; p++)
@@ -178,7 +182,7 @@ public class Euler244 {
 								System.out.print(full[p] + " ");
 							System.out.println();*/
 							
-							q.add(new Entry(newConfig, newPath));
+							q.add(new Entry(newConfig, length+1, newCheckSum));
 						}
 					}
 					else {
@@ -187,17 +191,8 @@ public class Euler244 {
 							minimum = length+1;
 						}
 						//int[] path = new int[length+1];
-						long pathSum = 0;
-						for (int p = 0; p < length; p++) {
-							pathSum = (pathSum * 243 + currentPath[p]) % 100000007;
-							//path[p] = currentConfig[n*n+p];
-						}
-						
-						//path[length] = direction;
-						pathSum = (pathSum * 243 + direction) % 100000007;
-						sum += pathSum;
-						//paths.add(path);
-						//System.out.println("added path YES");
+						sum += newCheckSum;
+						sum = sum % MOD;
 					}
 				}
 			}
@@ -207,7 +202,6 @@ public class Euler244 {
 	
 	public static void main(String[] args) {
 		visited = new HashSet<int[]>();
-		//paths = new ArrayList<int[]>();
 		minimum = Integer.MAX_VALUE;
 		Scanner s = new Scanner(System.in);
 		n = Integer.parseInt(s.nextLine());
@@ -231,7 +225,7 @@ public class Euler244 {
 		}
 		//for (int i: end) System.out.print(i + " ");
 		bfs(start,end);
-		System.out.println(sum % 100000007);
+		System.out.println(sum);
 		s.close();
 	}
 }

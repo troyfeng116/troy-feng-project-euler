@@ -53,10 +53,18 @@ public class Euler244 {
 	 * 		How to store paths without creating new "full" array?
 	 * 		Store configs as ints? (supports 16 digits...) */
 	
+	static class Entry {
+		int[] config; /* Configuration of tiles. */
+		int[] path; /* Sequence of L|U|R|D to reach config. */
+		
+		public Entry(int[] config, int[] path) {
+			this.config = config;
+			this.path = path;
+		}
+	}
+	
 	static Set<int[]> visited; // Track visited configs. No path after, just n*n visited configs.
-	
-	//static List<int[]> paths; // Store minimum paths, included after n*n terms.
-	
+		
 	static int minimum; // Store minimum steps.
 	
 	static int n; // Store dimension globally.
@@ -113,15 +121,18 @@ public class Euler244 {
 	 * Visited tracks configs (length n). Paths tracks paths (length minimum).
 	 * In queue, stored are configs reached by unique paths. First n*n elements are the config. Following indices store the path. */
 	public static void bfs(int[] config, int[] target) {
-		Queue<int[]> q = new LinkedList<int[]>();
-		q.add(config);
+		Queue<Entry> q = new LinkedList<Entry>();
+		Entry first = new Entry(config, new int[] {});
+		q.add(first);
 		while (!q.isEmpty()) {
-			int[] currentConfig = q.remove();
-			int length = currentConfig.length - n*n;
+			Entry e = q.remove();
+			int[] currentConfig = e.config;
+			int[] currentPath = e.path;
+			int length = currentPath.length;
 			//System.out.println("length: " + length);
 			//System.out.println("minimum: " + minimum);
 			if (length >= minimum) break;
-			int pos = indexOf(currentConfig, 87);
+			int pos = indexOf(currentConfig, 87); /* ALERT: CAN REDUCE RUNTIME HERE */
 			int[] test = new int[] {pos-1, pos+1, pos-n, pos+n};
 			//System.out.println("pos: " + pos);
 			for (int i: test) {//= 0; i < n*n && (i == pos-1 || i == pos+1 || i == pos+n || i == pos-n); i++) {
@@ -137,8 +148,11 @@ public class Euler244 {
 						System.out.print(newConfig[p] + " ");
 					System.out.println();*/
 					
+					newConfig[pos] = newConfig[i];
 					newConfig[i] = (int) 'W';
-					newConfig[pos] = currentConfig[i];
+					int direction = getDirection(pos, i);
+					int[] newPath = Arrays.copyOf(currentPath, length+1);
+					newPath[length] = direction;
 					
 					/*System.out.print("newConfig after swap with " + i + ": ");
 					for (int p = 0; p < n*n; p++)
@@ -149,22 +163,22 @@ public class Euler244 {
 						if (visited.contains(newConfig)) ;
 						else {
 							visited.add(newConfig);
-							int direction = getDirection(pos, i);
-							int[] full = new int[n*n + length + 1];
+							
+							
+							/*int[] full = new int[n*n + length + 1];
 							for (int x = 0; x < n*n; x++) {
 								full[x] = newConfig[x];
 							}
 							for (int x = n*n; x < currentConfig.length; x++)
 								full[x] = currentConfig[x];
-							full[currentConfig.length] = direction;
+							full[currentConfig.length] = direction;*/
 							
 							/*System.out.print("full after adding direction " + direction + ": ");
 							for (int p = 0; p < full.length; p++)
 								System.out.print(full[p] + " ");
 							System.out.println();*/
 							
-							q.add(full);
-							
+							q.add(new Entry(newConfig, newPath));
 						}
 					}
 					else {
@@ -172,14 +186,18 @@ public class Euler244 {
 							found = true;
 							minimum = length+1;
 						}
-						int direction = getDirection(pos, i);
+						//int[] path = new int[length+1];
 						long pathSum = 0;
 						for (int p = 0; p < length; p++) {
-							pathSum = (pathSum * 243 + currentConfig[n*n+p]) % 100000007;
+							pathSum = (pathSum * 243 + currentPath[p]) % 100000007;
+							//path[p] = currentConfig[n*n+p];
 						}
 						
+						//path[length] = direction;
 						pathSum = (pathSum * 243 + direction) % 100000007;
 						sum += pathSum;
+						//paths.add(path);
+						//System.out.println("added path YES");
 					}
 				}
 			}
@@ -213,19 +231,6 @@ public class Euler244 {
 		}
 		//for (int i: end) System.out.print(i + " ");
 		bfs(start,end);
-		
-		/*long ans = 0;
-		for (int i = 0; i < paths.size(); i++) {
-			long checkSum = 0;
-			for (int j = 0; j < paths.get(i).length; j++) {
-				checkSum = (checkSum * 243 + paths.get(i)[j]) % 100000007;
-				char c = (char) paths.get(i)[j];
-				System.out.print(c + " ");
-			}
-			System.out.println();
-			ans += checkSum;
-		}
-		System.out.println(ans % 100000007);*/
 		System.out.println(sum % 100000007);
 		s.close();
 	}

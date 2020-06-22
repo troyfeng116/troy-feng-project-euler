@@ -1,4 +1,4 @@
-/* -------- UNSOLVED: 44.44/100 --------*/
+/* -------- UNSOLVED: 50/100 --------*/
 
 /* Based on Fifteen Puzzle. In this case, it's NxN board. (N^2-1)/2 red tiles, N^2/2 blue tiles.
  * 
@@ -32,37 +32,34 @@ RRBB
 */
 
 //import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+//import java.util.Arrays;
+import java.util.HashMap;
+//import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 //import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.Set;
+//import java.util.Set;
 
 public class Euler244 {
 	
 	/* Approach: BFS. Once a solution is found, stop all other solutions that exceed its steps.
 	 * 
-	 * BFS takes: current config as array of chars, current white index, length of path, and target. 
-	 * 
-	 * In general, a config will be of length NxN + 1, and config(0) will be the length of the current config. 
-	 * When adding next to queue, increment length. 
-	 * Store visited configs. */
-	
-	/* NOTES: 
+	 * NOTES: 
 	 * 		bi-directional search?
 	 * 		How to store paths without creating new "full" array?
 	 * 		Store configs as ints? (supports 16 digits...) */
 	
 	static class Entry {
-		int[] config; /* Configuration of tiles. */
-		//int[] path; /* Sequence of L|U|R|D to reach config. */
-		int length;
+		long config; /* Configuration of tiles. */
+		int length; /* Length of sequence L|U|R|D taken to reach config. */
 		int checkSum;
+		int pos;
 		
-		public Entry(int[] config, int length, int checkSum) {
+		public Entry(long config, int pos, int length, int checkSum) {
 			this.config = config;
+			this.pos = pos;
 			this.length = length;
 			this.checkSum = checkSum;
 		}
@@ -70,11 +67,17 @@ public class Euler244 {
 	
 	static final int MOD = 100000007;
 	
-	static Set<int[]> visited; // Track visited configs. No path after, just n*n visited configs.
+	static Map<Long,Integer> visited; // Track visited configs and length to get there.
 		
 	static int minimum; // Store minimum steps.
 	
 	static int n; // Store dimension globally.
+	
+	static Map<Character,Integer> charToInt;
+	
+	static Map<Integer,Character> intToChar;
+	
+	static long[] tenToThe;
 	
 	static boolean found = false;
 	
@@ -82,6 +85,7 @@ public class Euler244 {
 	
 	/* Check if pos can be swapped with nextPos in board. If true, swaps them. */
 	public static boolean reachable(int pos, int next) {
+		if (next >= n*n || next < 0) return false;
 		if (pos == next) return false;
 		int p1 = pos+1; /* RIGHT */
 		int p2 = pos-1; /* LEFT */
@@ -115,82 +119,61 @@ public class Euler244 {
 		return (int) 'D';
 	}
 	
-	/* IndexOf helper. Only searches first n*n elements corresponding to board. */
+	/* IndexOf helper. */
 	public static int indexOf(int[] arr, int target) {
-		for (int i = 0; i < n*n; i++) {
+		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] == target) return i;
 		}
 		return -1;
+	}
+	
+	/* Given that num is n*n digits, return number from swapping digits at indices pos and i, given that
+	 * the digit at pos is 3. */
+	public static long swap(long num, int numDigits, int pos, int i) {
+		int iTemp = (int) ((num % tenToThe[numDigits-i]) / tenToThe[numDigits-i-1]);
+		num -= 3 * tenToThe[numDigits-pos-1];
+		num -= iTemp * tenToThe[numDigits-i-1];
+		num += 3 * tenToThe[numDigits-i-1];
+		num += iTemp * tenToThe[numDigits-pos-1];
+		return num;
 	}
 	
 	/* BFS. */
 	/* Pseudocode: While queue not empty, remove head of queue. Add all reachable non visited configs from that head to queue.
 	 * Visited tracks configs (length n). Paths tracks paths (length minimum).
 	 * In queue, stored are configs reached by unique paths. First n*n elements are the config. Following indices store the path. */
-	public static void bfs(int[] config, int[] target) {
+	public static void bfs(long config, int startPos, long target) {
 		Queue<Entry> q = new LinkedList<Entry>();
-		Entry first = new Entry(config, 0, 0);
+		Entry first = new Entry(config, startPos, 0, 0);
 		q.add(first);
 		while (!q.isEmpty()) {
 			Entry e = q.remove();
 			int length = e.length;
-			int[] currentConfig = e.config;
-			
 			if (length >= minimum) break;
-			int pos = indexOf(currentConfig, 87); /* ALERT: CAN REDUCE RUNTIME HERE */
+			long currentConfig = e.config;
+			int pos = e.pos;
 			int[] test = new int[] {pos-1, pos+1, pos-n, pos+n};
-			//System.out.println("pos: " + pos);
-			for (int i: test) {//= 0; i < n*n && (i == pos-1 || i == pos+1 || i == pos+n || i == pos-n); i++) {
+			for (int i: test) {
 				/* For each reachable position, test if target or add to queue. */
 				if (reachable(pos, i)) {
-					/*int[] newConfig = new int[n*n];
-					for (int k = 0; k < n*n; k++)
-						newConfig[k] = currentConfig[k];*/
-					int[] newConfig = Arrays.copyOf(currentConfig, currentConfig.length);
-					
-					/*System.out.print("newConfig before swap: ");
-					for (int p = 0; p < n*n; p++)
-						System.out.print(newConfig[p] + " ");
-					System.out.println();*/
-					
-					newConfig[pos] = newConfig[i];
-					newConfig[i] = (int) 'W';
+					long newConfig = swap(currentConfig, n*n, pos, i);
+					//System.out.println(newConfig);
 					int direction = getDirection(pos, i);
 					int newCheckSum = (int) ((((long) e.checkSum * 243) + direction) % MOD);
-					
-					/*System.out.print("newConfig after swap with " + i + ": ");
-					for (int p = 0; p < n*n; p++)
-						System.out.print(newConfig[p] + " ");
-					System.out.println();*/
-					
-					if (!Arrays.equals(newConfig, target)) {
-						if (visited.contains(newConfig)) ;
+					//System.out.println(newCheckSum);
+					if (newConfig != target) {
+						if (visited.containsKey(newConfig) && visited.get(newConfig) > length+1) ;
 						else {
-							visited.add(newConfig);
-							
-							
-							/*int[] full = new int[n*n + length + 1];
-							for (int x = 0; x < n*n; x++) {
-								full[x] = newConfig[x];
-							}
-							for (int x = n*n; x < currentConfig.length; x++)
-								full[x] = currentConfig[x];
-							full[currentConfig.length] = direction;*/
-							
-							/*System.out.print("full after adding direction " + direction + ": ");
-							for (int p = 0; p < full.length; p++)
-								System.out.print(full[p] + " ");
-							System.out.println();*/
-							
-							q.add(new Entry(newConfig, length+1, newCheckSum));
+							visited.put(newConfig,length+1);
+							q.add(new Entry(newConfig, i, length+1, newCheckSum));
 						}
 					}
 					else {
+						//System.out.println("FOUND");
 						if (!found) {
 							found = true;
 							minimum = length+1;
 						}
-						//int[] path = new int[length+1];
 						sum += newCheckSum;
 						sum = sum % MOD;
 					}
@@ -201,30 +184,52 @@ public class Euler244 {
 	
 	
 	public static void main(String[] args) {
-		visited = new HashSet<int[]>();
+		visited = new HashMap<Long,Integer>();
 		minimum = Integer.MAX_VALUE;
+		
+		charToInt = new HashMap<Character,Integer>();
+		charToInt.put('B', 1);
+		charToInt.put('R', 2);
+		charToInt.put('W', 3);
+		
+		intToChar = new HashMap<Integer,Character>();
+		intToChar.put(1, 'B');
+		intToChar.put(2, 'R');
+		intToChar.put(3, 'W');
+		
+		tenToThe = new long[17];
+		tenToThe[0] = 1;
+		for (int i = 1; i <= 16; i++) {
+			tenToThe[i] = tenToThe[i-1] * 10;
+		}
+		/*
+		System.out.println(swap(123456789123L, 12, 1,10));
+		System.exit(0);
+		*/
 		Scanner s = new Scanner(System.in);
 		n = Integer.parseInt(s.nextLine());
 		/* Read and store start. */
-		int[] start = new int[n*n];
+		long start = 0;
+		int blankStart = 0;
 		for (int i = 0; i < n; i++) {
 			String sInput = s.nextLine();
 			for (int j = 0; j < n; j++) {
-				start[i*n+j] = (int) sInput.charAt(j);
+				if (sInput.charAt(j) == 'W') blankStart = i*n+j;
+				start = start*10 + charToInt.get(sInput.charAt(j));
 			}
 		}
-		//for (int i: start) System.out.print(i + " ");
-		visited.add(start);
+		//System.out.println("Start2: " + start2);
+		visited.put(start, 0);
 		/* Read and store end. */
-		int[] end = new int[n*n];
+		long end = 0;
 		for (int i = 0; i < n; i++) {
 			String eInput = s.nextLine();
 			for (int j = 0; j < n; j++) {
-				end[i*n+j] = (int) eInput.charAt(j);
+				end = end*10 + charToInt.get(eInput.charAt(j));
 			}
 		}
-		//for (int i: end) System.out.print(i + " ");
-		bfs(start,end);
+		//System.out.println("End2: " + end2);
+		bfs(start, blankStart, end);
 		System.out.println(sum);
 		s.close();
 	}

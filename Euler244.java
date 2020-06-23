@@ -47,15 +47,13 @@ public class Euler244 {
 	/* Approach: BFS. Once a solution is found, stop all other solutions that exceed its steps.
 	 * 
 	 * NOTES: 
-	 * 		bi-directional search?
-	 * 		How to store paths without creating new "full" array?
-	 * 		Store configs as ints? (supports 16 digits...) */
+	 * 		bi-directional search? */
 	
 	static class Entry {
 		long config; /* Configuration of tiles. */
 		int length; /* Length of sequence L|U|R|D taken to reach config. */
-		int checkSum;
-		int pos;
+		int checkSum; /* CheckSum of sequence taken to reach config. */
+		int pos; /* Index of the blank tile in config. */
 		
 		public Entry(long config, int pos, int length, int checkSum) {
 			this.config = config;
@@ -85,7 +83,7 @@ public class Euler244 {
 	
 	/* Check if pos can be swapped with nextPos in board. If true, swaps them. */
 	public static boolean reachable(int pos, int next) {
-		if (next >= n*n || next < 0) return false;
+		//if (next >= n*n || next < 0) return false;
 		if (pos == next) return false;
 		int p1 = pos+1; /* RIGHT */
 		int p2 = pos-1; /* LEFT */
@@ -119,14 +117,6 @@ public class Euler244 {
 		return (int) 'D';
 	}
 	
-	/* IndexOf helper. */
-	public static int indexOf(int[] arr, int target) {
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] == target) return i;
-		}
-		return -1;
-	}
-	
 	/* Given that num is n*n digits, return number from swapping digits at indices pos and i, given that
 	 * the digit at pos is 3. */
 	public static long swap(long num, int numDigits, int pos, int i) {
@@ -152,15 +142,13 @@ public class Euler244 {
 			if (length >= minimum) break;
 			long currentConfig = e.config;
 			int pos = e.pos;
-			int[] test = new int[] {pos-1, pos+1, pos-n, pos+n};
-			for (int i: test) {
+			//int[] test = new int[] {pos-1, pos+1, pos-n, pos+n};
+			for (int i = 0; i < n*n; i++) {//(int i: test) {
 				/* For each reachable position, test if target or add to queue. */
 				if (reachable(pos, i)) {
 					long newConfig = swap(currentConfig, n*n, pos, i);
-					//System.out.println(newConfig);
 					int direction = getDirection(pos, i);
 					int newCheckSum = (int) ((((long) e.checkSum * 243) + direction) % MOD);
-					//System.out.println(newCheckSum);
 					if (newConfig != target) {
 						if (visited.containsKey(newConfig) && visited.get(newConfig) > length+1) ;
 						else {
@@ -169,7 +157,6 @@ public class Euler244 {
 						}
 					}
 					else {
-						//System.out.println("FOUND");
 						if (!found) {
 							found = true;
 							minimum = length+1;
@@ -202,10 +189,7 @@ public class Euler244 {
 		for (int i = 1; i <= 16; i++) {
 			tenToThe[i] = tenToThe[i-1] * 10;
 		}
-		/*
-		System.out.println(swap(123456789123L, 12, 1,10));
-		System.exit(0);
-		*/
+
 		Scanner s = new Scanner(System.in);
 		n = Integer.parseInt(s.nextLine());
 		/* Read and store start. */
@@ -218,7 +202,6 @@ public class Euler244 {
 				start = start*10 + charToInt.get(sInput.charAt(j));
 			}
 		}
-		//System.out.println("Start2: " + start2);
 		visited.put(start, 0);
 		/* Read and store end. */
 		long end = 0;
@@ -228,9 +211,13 @@ public class Euler244 {
 				end = end*10 + charToInt.get(eInput.charAt(j));
 			}
 		}
-		//System.out.println("End2: " + end2);
+		//long startTime = System.nanoTime();
 		bfs(start, blankStart, end);
+		//long endTime = System.nanoTime();
+		//long duration = (endTime - startTime) / 1000000;
+		
 		System.out.println(sum);
+		//System.out.println("Runtime: " + duration + " ms");
 		s.close();
 	}
 }

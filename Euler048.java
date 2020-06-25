@@ -28,14 +28,18 @@ public class Euler048 {
 	
 	static final long MOD = 10000000000L;
 	
-	/* This quick exponentiation algorithm reduces runtime of calculating x^n from linear to logarithmic
+	/* This quick exponentiation algorithm reduces runtime of calculating n1^n1 from linear to logarithmic
 	 * complexity. All done under mod 10^10. */
-	public static long pow(int n1, int pow) {
-		if (pow == 1) return n1;
-		long n2 = pow(n1,pow/2) % MOD;
-		long n3 = (mult(n2,n2)) % MOD;
-		if (pow%2 == 0) return n3;
-		return n3*n1 % MOD;
+	public static long pow(long n1, int pow) {
+		long ans = 1;
+		while (pow > 0) {
+			if (pow % 2 == 1) {
+				ans = mult(n1,ans) % MOD;
+			}
+			pow /= 2;
+			n1 = mult(n1,n1) % MOD;
+		}
+		return ans;
 	}
 	
 	/* If n1,n2 < 10^10, long overflow is a problem for n1*n2. Need doubles to prevent. */

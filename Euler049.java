@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Euler49 {
+public class Euler049 {
 	
 	/* Thoughts/approach: Brute force would be to loop through primes up to N, look at prime permutations,
 	 * and see if any form an arithmetic progression of length 3 or 4. Seeing as to how the inputs go up to

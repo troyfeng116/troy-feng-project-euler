@@ -26,10 +26,10 @@ public class Euler49 {
 	 * and see if any form an arithmetic progression of length 3 or 4. Seeing as to how the inputs go up to
 	 * six digits, that would definitely be too slow.
 	 * 
-	 * There's a neat way to store prime permutations. We can represent the prime number 1019 as 020000001,
-	 * where the i'th (zero-based) digit of that ten-digit number is the number of times i appears in the
-	 * original number. This mapping has the useful property that numbers that are digit-wise permutations
-	 * of each other will map to the same key.  */
+	 * There's a clean way to store and look up prime permutations. We can represent the prime number 1019 
+	 * as 020000001, where the i'th (zero-based) digit of that ten-digit number is the number of times i 
+	 * appears in the original number. This mapping has the useful property that numbers that are digit-wise 
+	 * permutations of each other will map to the same key.  */
 	
 	/* Primes in permutation sequences may be larger than 10^6. */
 	static final int MAX_N = 10000000;
@@ -85,7 +85,7 @@ public class Euler49 {
 				putInTable(i);
 			}
 			if (i+2 <= MAX_N && !composite[i+2]) {
-				putInTable(i);
+				putInTable(i+2);
 			}
 		}
 	}
@@ -185,7 +185,6 @@ public class Euler49 {
 		for (int i = 0; i < ans.size(); i++) {
 			System.out.println(ans.get(i));
 		}
-		
 		s.close();
 	}
 }

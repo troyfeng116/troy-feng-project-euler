@@ -41,6 +41,52 @@ public class Euler050 {
 			}
 		}
 	}
+
+	/* Fast modular exponentiation. Return n^p % mod. */
+	public static long pow(long n, long pow, long mod) {
+		if (pow == 1) return n%mod;
+		long sqrt = pow(n,pow/2,mod);
+		long ans = mult(sqrt,sqrt,mod);
+		if (pow%2 == 1) ans = mult(ans,n,mod);
+		return ans%mod;
+	}
+
+	/* Return a*b % mod, preventing long overflow. */
+	public static long mult(long a, long b, long mod) {
+		long x = (long) (((double)a*b)/mod);
+		long ans = (a*b-x*mod);
+		return ans<0 ? ans+mod : ans;
+	}
+
+	/* Use randomized Miller-Rabin primality test to determine if a large odd n is prime. Pre-conditions:
+	 * n is odd. k specifies number of repetitions.
+	 * See https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test */
+	public static boolean isPrime(long n, int k) {
+		/* Write (n-1) as d*2^s, where d is odd. */
+		int s = 0;
+		long d = n-1;
+		while (d%2==0) {
+			s++;
+			d/=2;
+		}
+		for (int rep = 0; rep < k; rep++) {
+			boolean reset = false;
+			long a = 2 + ((long) (Math.random()*(n-3)));
+			long x = pow(a,d,n);
+			if (x == 1 || x == n-1) continue;
+			for (int i = 0; i < s-1; i++) {
+				x = mult(x,x,n);
+				if (x == n-1) {
+					reset = true;
+					break;
+				}
+			}
+			if (reset) continue;
+			else return false;
+		}
+
+		return true;
+	}
 	
 	public static void main(String[] args) {
 		sieve(6000000);
@@ -60,6 +106,7 @@ public class Euler050 {
 			}
 		}
 		System.out.println("count: " + count + " sum: " + sum + " last prime: " + lastPrime);
+		System.out.println(pow(1000,1000,1007));
 		System.exit(0);
 		
 		Scanner s = new Scanner(System.in);

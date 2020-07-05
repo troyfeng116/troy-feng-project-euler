@@ -94,6 +94,26 @@ public class Euler050 {
 		}
 		return true;
 	}
+
+	public static long[] getSum(long sum, int len, int start, int end, int soFar, long n) {
+		if (len < soFar) return null;
+		if (isPrime(sum,3)) return new long[] {sum,len};
+		long[] ans2 = getSum(sum-prime[start], len-1, start+1, end, soFar, n);
+		if (ans2 != null) soFar = (int) Math.max(soFar,ans2[1]);
+		long[] ans1 = getSum(sum-prime[end], len-1, start, end-1, soFar, n);
+		if (ans1 != null) soFar = (int) ans1[1];
+		long[] ans3 = null;
+		if (sum + prime[end+1] < n) {
+			ans3 = getSum(sum+prime[end+1], len-1, start, end+1, soFar, n);
+			if (ans3 != null) soFar = (int) Math.max(soFar, ans3[1]);
+		}
+
+		long ansSum = Long.MAX_VALUE;
+		if (ans1 != null && (int) ans1[1] == soFar) ansSum = Math.min(ansSum, ans1[0]);
+		if (ans2 != null && (int) ans2[1] == soFar) ansSum = Math.min(ansSum, ans2[0]);
+		if (ans3 != null && (int) ans3[1] == soFar) ansSum = Math.min(ansSum, ans3[0]);
+		return new long[] {ansSum, soFar};
+	}
 	
 	public static void main(String[] args) {
 		sieve(6000000);
@@ -116,7 +136,7 @@ public class Euler050 {
 		for (int t0 = 0; t0 < t; t0++) {
 			long n = Long.parseLong(s.nextLine());
 			long ansSum = 0;
-			long ansLen = 0;
+			int ansLen = 0;
 
 			long sum = 0;
 			int curPrime = 0;
@@ -133,8 +153,9 @@ public class Euler050 {
 			}
 			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2 and ending
 			 * with curPrime. */
-			System.out.println("SUM: " + sum + " LENGTH: " + len);
-			int lastPrime = curPrime;
+			//System.out.println("SUM: " + sum + " LENGTH: " + len);
+			//System.out.println("SO FAR: " + ansSum + " " + ansLen);
+			/*int lastPrime = curPrime;
 			int startPrime = 1;
 
 			int startingPoint = 2;
@@ -163,11 +184,13 @@ public class Euler050 {
 				}
 				lastPrime = curPrime;
 				startPrime++;
-			}
+			}*/
+			long[] ans2 = getSum(sum, len, 0, curPrime-1, ansLen, n);
 
 			
-			System.out.println(ansSum + " " + ansLen);
-			System.out.println("STARTED FROM: " + startingPoint);
+			//System.out.println(ansSum + " " + ansLen);
+			System.out.println(ans2[0] + " " + ans2[1]);
+			//System.out.println("STARTED FROM: " + startingPoint);
 		}
 		s.close();
 	}

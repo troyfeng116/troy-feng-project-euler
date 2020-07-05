@@ -29,14 +29,22 @@ public class Euler050 {
 	
 	final static long MAX_N = 1000000000000L;
 	static boolean[] composite;
+	/* Store the primes in order (prime[0]=2, prime[1]=3,...) */
+	static int[] prime;
 	
 	/* Sieve up to and including max. */
 	public static void sieve(int max) {
 		composite = new boolean[max+1];
+		prime = new int[max+1];
+		int index = 0;
 		for (int i = 2; i <= max; i++) {
-			if (!composite[i] && i <= Math.sqrt(max)) {
-				for (int j = i*i; j <= max; j+=i) {
-					composite[j] = true;
+			if (!composite[i]) {
+				prime[index] = i;
+				index++;
+				if (i <= Math.sqrt(max)) {
+					for (int j = i*i; j <= max; j+=i) {
+						composite[j] = true;
+					}
 				}
 			}
 		}
@@ -58,8 +66,7 @@ public class Euler050 {
 		return ans<0 ? ans+mod : ans;
 	}
 
-	/* Use randomized Miller-Rabin primality test to determine if a large odd n is prime. Pre-conditions:
-	 * n is odd. k specifies number of repetitions.
+	/* Use randomized Miller-Rabin primality test to determine if a large n is prime. k specifies number of repetitions.
 	 * See https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test */
 	public static boolean isPrime(long n, int k) {
 		if (n < 6000000) return !composite[(int) n];
@@ -88,58 +95,40 @@ public class Euler050 {
 		return true;
 	}
 
-	/* Given that n is prime, returns next prime larger than n. */
-	public static int nextPrime(int n) {
-		if (n == 2) return 3;
-		int i = n+2;
-		while (composite[i]) i+=2;
-		return i;
-	}
-
-	/* Given that n is prime, returns largest prime smaller than n. */
-	public static int prevPrime(int n) {
-		if (n <= 2) return -1;
-		if (n == 3) return 2;
-		int i = n-2;
-		while (composite[i]) i -= 2;
-		return i;
-	}
-
 	/* Given a sum consisting of consecutive primes from start to end inclusive of length len, return
-	 * an array containing the prime sum with the longest length. Recursively subtracts prime off both
-	 * ends, prioritizing the larger end. */
-	public static long[] getSum(long sum, int start, int end, int len) {
-		if (start >= end) return new long[] {sum,1};
-		if (isPrime(sum,5)) return new long[] {sum,len};
-		int prev = prevPrime(end);
-		long[] ans1 = getSum(sum-end, start, prev, len-1);
-		int next = nextPrime(start);
-		long[] ans2 = getSum(sum-start, next, end, len-1);
-		if (ans1[1] < ans2[1]) return ans2;
-		if (ans1[1] > ans2[1]) return ans1;
-		return ans1[0] < ans2[0] ? ans1 : ans2;
+	 * a prime sum of consecutive primes within that sequence. */
+	static int maxLen = Integer.MIN_VALUE;
+	static long ansSum = Long.MAX_VALUE;
+	public static void getSum(long sum, int start, int end, int len) {
+		if (len < maxLen) return;
+		if (isPrime(sum,5)) {
+			if (len == maxLen) {
+				ansSum = Math.min(sum, ansSum);
+			}
+			else if (len > maxLen) {
+				maxLen = len;
+				ansSum = sum;
+			}
+			return;
+		}
+		if (start >= end) {
+			maxLen = 1;
+			ansSum = prime[start];
+		}
+		getSum(sum-prime[end], start, end-1, len-1);
+		getSum(sum-prime[start], start+1, end, len-1);
 	}
 	
 	public static void main(String[] args) {
 		sieve(6000000);
-		long testSum = 2+3+5+7;
-		int count = 4;
-		int lastPrime = 7;
-		for (int i = 11; i < composite.length && testSum < MAX_N; i+=6) {
-			if (!composite[i]) {
-				count++;
-				testSum += i;
-				lastPrime = i;
-			}
-			if (i+2 < composite.length && !composite[i+2] && testSum < MAX_N) {
-				count++;
-				testSum += i+2;
-				lastPrime = i+2;
-			}
+		long testSum = 0;
+		int count = 0;
+		for (; testSum <= MAX_N; count++) {
+			testSum += prime[count];
 		}
 		
-		/*System.out.println("count: " + count + " sum: " + testSum + " last prime: " + lastPrime);
-		System.out.println(pow(1000,1000,1007));
+		System.out.println("count: " + count + " sum: " + testSum + " last prime: " + prime[count]);
+		/*System.out.println(pow(1000,1000,1007));
 		for (int i = 0; i < 100000; i++) {
 			if (!isPrime(100000000003L,5)) System.out.println("SHIT");
 		}
@@ -149,20 +138,20 @@ public class Euler050 {
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			long n = Long.parseLong(s.nextLine());
-			long sum = 2;
-			int curPrime = 2;
-			int length = 1;
-			while (sum + curPrime <= n) {
-				curPrime = nextPrime(curPrime);
-				sum += curPrime;
+			long sum = 0;
+			int curPrime = 0;
+			int length = 0;
+			while (sum + prime[curPrime] <= n) {
+				sum += prime[curPrime];
+				curPrime++;
 				length++;
 				//System.out.println("added " + curPrime + " to get sum " + sum);
 			}
 			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2 and ending
 			 * with curPrime. */
 			System.out.println("SUM: " + sum + " LENGTH: " + length);
-			long[] ans = getSum(sum, 2, curPrime, length);
-			System.out.println(ans[0] + " " + ans[1]);
+			getSum(sum, 0, curPrime-1, length);
+			System.out.println(ansSum + " " + maxLen);
 		}
 		s.close();
 	}

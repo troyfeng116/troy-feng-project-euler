@@ -97,13 +97,14 @@ public class Euler050 {
 	
 	public static void main(String[] args) {
 		sieve(6000000);
-		long testSum = 0;
+		/*long testSum = 0;
 		int count = 0;
 		for (; testSum <= MAX_N; count++) {
 			testSum += prime[count];
 		}
 		
-		System.out.println("count: " + count + " sum: " + testSum + " last prime: " + prime[count]);
+		System.out.println("count: " + count + " sum: " + testSum + " last prime: " + prime[count]);*/
+
 		/*System.out.println(pow(1000,1000,1007));
 		for (int i = 0; i < 100000; i++) {
 			if (!isPrime(100000000003L,5)) System.out.println("SHIT");
@@ -114,25 +115,30 @@ public class Euler050 {
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			long n = Long.parseLong(s.nextLine());
+			long ansSum = 0;
+			long ansLen = 0;
+
 			long sum = 0;
 			int curPrime = 0;
 			int len = 0;
-			long ansSum = 0;
-			long ansLen = 0;
+	
 			while (sum + prime[curPrime] <= n) {
 				sum += prime[curPrime];
 				curPrime++;
 				len++;
-				if (isPrime(sum,5)) {
+				if (isPrime(sum,3)) {
 					ansSum = sum;
 					ansLen = len;
 				}
 			}
 			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2 and ending
 			 * with curPrime. */
-			//System.out.println("SUM: " + sum + " LENGTH: " + len);
+			System.out.println("SUM: " + sum + " LENGTH: " + len);
 			int lastPrime = curPrime;
 			int startPrime = 1;
+
+			int startingPoint = 2;
+
 			while (lastPrime - startPrime + 1 >= ansLen) {
 				curPrime = startPrime;
 				sum = 0;
@@ -142,11 +148,15 @@ public class Euler050 {
 					curPrime++;
 					len++;
 					if (len >= ansLen) {
-						if (isPrime(sum,5)) {
-							if (len == ansLen) ansSum = Math.min(sum, ansSum);
+						if (isPrime(sum,3)) {
+							if (len == ansLen) {
+								ansSum = Math.min(sum, ansSum);
+								startingPoint = prime[startPrime];
+							}
 							else {
 								ansLen = len;
 								ansSum = sum;
+								startingPoint = prime[startPrime];
 							}
 						}
 					}
@@ -157,6 +167,7 @@ public class Euler050 {
 
 			
 			System.out.println(ansSum + " " + ansLen);
+			System.out.println("STARTED FROM: " + startingPoint);
 		}
 		s.close();
 	}

@@ -85,7 +85,6 @@ public class Euler050 {
 			if (reset) continue;
 			else return false;
 		}
-
 		return true;
 	}
 
@@ -95,6 +94,30 @@ public class Euler050 {
 		int i = n+2;
 		while (composite[i]) i+=2;
 		return i;
+	}
+
+	/* Given that n is prime, returns largest prime smaller than n. */
+	public static int prevPrime(int n) {
+		if (n <= 2) return -1;
+		if (n == 3) return 2;
+		int i = n-2;
+		while (composite[i]) i -= 2;
+		return i;
+	}
+
+	/* Given a sum consisting of consecutive primes from start to end inclusive of length len, return
+	 * an array containing the prime sum with the longest length. Recursively subtracts prime off both
+	 * ends, prioritizing the larger end. */
+	public static long[] getSum(long sum, int start, int end, int len) {
+		if (start >= end) return new long[] {sum,1};
+		if (isPrime(sum,5)) return new long[] {sum,len};
+		int prev = prevPrime(end);
+		long[] ans1 = getSum(sum-end, start, prev, len-1);
+		int next = nextPrime(start);
+		long[] ans2 = getSum(sum-start, next, end, len-1);
+		if (ans1[1] < ans2[1]) return ans2;
+		if (ans1[1] > ans2[1]) return ans1;
+		return ans1[0] < ans2[0] ? ans1 : ans2;
 	}
 	
 	public static void main(String[] args) {
@@ -114,29 +137,32 @@ public class Euler050 {
 				lastPrime = i+2;
 			}
 		}
-		System.out.println("count: " + count + " sum: " + testSum + " last prime: " + lastPrime);
+		
+		/*System.out.println("count: " + count + " sum: " + testSum + " last prime: " + lastPrime);
 		System.out.println(pow(1000,1000,1007));
-		//System.exit(0);
+		for (int i = 0; i < 100000; i++) {
+			if (!isPrime(100000000003L,5)) System.out.println("SHIT");
+		}
+		System.exit(0);*/
 		
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			long n = Long.parseLong(s.nextLine());
-			long ans = 2;
 			long sum = 2;
 			int curPrime = 2;
-			while (sum <= n) {
+			int length = 1;
+			while (sum + curPrime <= n) {
 				curPrime = nextPrime(curPrime);
 				sum += curPrime;
+				length++;
 				//System.out.println("added " + curPrime + " to get sum " + sum);
-				if (isPrime(sum,15)) ans = sum;
 			}
-			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2. We can now start
-			 * lopping off terms from the front of the sum (i.e. subtract 2, subtract 2+3+5, subtract 2+3+5+7+11,
-			 * etc.) We subtract terms two at a time after 2 to preserve odd parity. Note that curPrime also holds
-			 * the last prime we added to get to sum. Once there's room to add the next prime, we can add it back.
-			 *  */
-			System.out.println(ans);
+			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2 and ending
+			 * with curPrime. */
+			System.out.println("SUM: " + sum + " LENGTH: " + length);
+			long[] ans = getSum(sum, 2, curPrime, length);
+			System.out.println(ans[0] + " " + ans[1]);
 		}
 		s.close();
 	}

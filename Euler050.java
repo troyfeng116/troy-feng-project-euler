@@ -94,30 +94,6 @@ public class Euler050 {
 		}
 		return true;
 	}
-
-	/* Given a sum consisting of consecutive primes from start to end inclusive of length len, return
-	 * a prime sum of consecutive primes within that sequence. */
-	static int maxLen = Integer.MIN_VALUE;
-	static long ansSum = Long.MAX_VALUE;
-	public static void getSum(long sum, int start, int end, int len) {
-		if (len < maxLen) return;
-		if (isPrime(sum,5)) {
-			if (len == maxLen) {
-				ansSum = Math.min(sum, ansSum);
-			}
-			else if (len > maxLen) {
-				maxLen = len;
-				ansSum = sum;
-			}
-			return;
-		}
-		if (start >= end) {
-			maxLen = 1;
-			ansSum = prime[start];
-		}
-		getSum(sum-prime[end], start, end-1, len-1);
-		getSum(sum-prime[start], start+1, end, len-1);
-	}
 	
 	public static void main(String[] args) {
 		sieve(6000000);
@@ -140,18 +116,47 @@ public class Euler050 {
 			long n = Long.parseLong(s.nextLine());
 			long sum = 0;
 			int curPrime = 0;
-			int length = 0;
+			int len = 0;
+			long ansSum = 0;
+			long ansLen = 0;
 			while (sum + prime[curPrime] <= n) {
 				sum += prime[curPrime];
 				curPrime++;
-				length++;
-				//System.out.println("added " + curPrime + " to get sum " + sum);
+				len++;
+				if (isPrime(sum,5)) {
+					ansSum = sum;
+					ansLen = len;
+				}
 			}
 			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2 and ending
 			 * with curPrime. */
-			System.out.println("SUM: " + sum + " LENGTH: " + length);
-			getSum(sum, 0, curPrime-1, length);
-			System.out.println(ansSum + " " + maxLen);
+			//System.out.println("SUM: " + sum + " LENGTH: " + len);
+			int lastPrime = curPrime;
+			int startPrime = 1;
+			while (lastPrime - startPrime + 1 >= ansLen) {
+				curPrime = startPrime;
+				sum = 0;
+				len = 0;
+				while (sum + prime[curPrime] <= n) {
+					sum += prime[curPrime];
+					curPrime++;
+					len++;
+					if (len >= ansLen) {
+						if (isPrime(sum,5)) {
+							if (len == ansLen) ansSum = Math.min(sum, ansSum);
+							else {
+								ansLen = len;
+								ansSum = sum;
+							}
+						}
+					}
+				}
+				lastPrime = curPrime;
+				startPrime++;
+			}
+
+			
+			System.out.println(ansSum + " " + ansLen);
 		}
 		s.close();
 	}

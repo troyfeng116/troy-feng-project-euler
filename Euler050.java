@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* The prime 41, can be written as the sum of six consecutive primes:
  * 
@@ -29,10 +29,10 @@ public class Euler050 {
 	
 	final static long MAX_N = 1000000000000L;
 	static boolean[] composite;
-	/* Store the primes in order (prime[0]=2, prime[1]=3,...) */
+	/* Store the primes in order so that prime[k] holds the k'th prime (zero-based, i,e. prime[0] = 2). */
 	static int[] prime;
 	
-	/* Sieve up to and including max. */
+	/* Sieve up to and including max. Also populate prime-by-prime storage in prime[]. */
 	public static void sieve(int max) {
 		composite = new boolean[max+1];
 		prime = new int[max+1];
@@ -66,10 +66,11 @@ public class Euler050 {
 		return ans<0 ? ans+mod : ans;
 	}
 
-	/* Use randomized Miller-Rabin primality test to determine if a large n is prime. k specifies number of repetitions.
-	 * See https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test */
+	/* Miller-Rabin primality test. k specifies number of repetitions.
+	 * https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test */
 	public static boolean isPrime(long n, int k) {
 		if (n < 6000000) return !composite[(int) n];
+		if (n%2 == 0 || n%3 == 0) return false;
 		/* Write (n-1) as d*2^s, where d is odd. */
 		int s = 0;
 		long d = n-1;
@@ -94,43 +95,11 @@ public class Euler050 {
 		}
 		return true;
 	}
-
-	public static long[] getSum(long sum, int len, int start, int end, int soFar, long n) {
-		if (len < soFar) return null;
-		if (isPrime(sum,3)) return new long[] {sum,len};
-		long[] ans2 = getSum(sum-prime[start], len-1, start+1, end, soFar, n);
-		if (ans2 != null) soFar = (int) Math.max(soFar,ans2[1]);
-		long[] ans1 = getSum(sum-prime[end], len-1, start, end-1, soFar, n);
-		if (ans1 != null) soFar = (int) ans1[1];
-		long[] ans3 = null;
-		if (sum + prime[end+1] < n) {
-			ans3 = getSum(sum+prime[end+1], len-1, start, end+1, soFar, n);
-			if (ans3 != null) soFar = (int) Math.max(soFar, ans3[1]);
-		}
-
-		long ansSum = Long.MAX_VALUE;
-		if (ans1 != null && (int) ans1[1] == soFar) ansSum = Math.min(ansSum, ans1[0]);
-		if (ans2 != null && (int) ans2[1] == soFar) ansSum = Math.min(ansSum, ans2[0]);
-		if (ans3 != null && (int) ans3[1] == soFar) ansSum = Math.min(ansSum, ans3[0]);
-		return new long[] {ansSum, soFar};
-	}
 	
 	public static void main(String[] args) {
+		/* Precomputed: the sum of all primes below 6000000 exceeds MAX_N. */
 		sieve(6000000);
-		/*long testSum = 0;
-		int count = 0;
-		for (; testSum <= MAX_N; count++) {
-			testSum += prime[count];
-		}
-		
-		System.out.println("count: " + count + " sum: " + testSum + " last prime: " + prime[count]);*/
 
-		/*System.out.println(pow(1000,1000,1007));
-		for (int i = 0; i < 100000; i++) {
-			if (!isPrime(100000000003L,5)) System.out.println("SHIT");
-		}
-		System.exit(0);*/
-		
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
@@ -141,7 +110,8 @@ public class Euler050 {
 			long sum = 0;
 			int curPrime = 0;
 			int len = 0;
-	
+			
+			/* Get preliminary ansSum and ansLen values, with chain starting from 2. */
 			while (sum + prime[curPrime] <= n) {
 				sum += prime[curPrime];
 				curPrime++;
@@ -151,15 +121,12 @@ public class Euler050 {
 					ansLen = len;
 				}
 			}
-			/* Right now, sum holds the largest sum of consecutive primes <= N, starting from 2 and ending
-			 * with curPrime. */
-			//System.out.println("SUM: " + sum + " LENGTH: " + len);
-			//System.out.println("SO FAR: " + ansSum + " " + ansLen);
-			/*int lastPrime = curPrime;
+
+			/* Right now, sum holds the largest chain sum of consecutive primes <= N, starting from 2 and ending
+			 * with curPrime. Increment the starting point prime by prime. */
+			int lastPrime = curPrime;
 			int startPrime = 1;
-
-			int startingPoint = 2;
-
+			/* While the longest possible length starting from startPrime is >= ansLen thus far: */
 			while (lastPrime - startPrime + 1 >= ansLen) {
 				curPrime = startPrime;
 				sum = 0;
@@ -172,25 +139,18 @@ public class Euler050 {
 						if (isPrime(sum,3)) {
 							if (len == ansLen) {
 								ansSum = Math.min(sum, ansSum);
-								startingPoint = prime[startPrime];
 							}
 							else {
 								ansLen = len;
 								ansSum = sum;
-								startingPoint = prime[startPrime];
 							}
 						}
 					}
 				}
 				lastPrime = curPrime;
 				startPrime++;
-			}*/
-			long[] ans2 = getSum(sum, len, 0, curPrime-1, ansLen, n);
-
-			
-			//System.out.println(ansSum + " " + ansLen);
-			System.out.println(ans2[0] + " " + ans2[1]);
-			//System.out.println("STARTED FROM: " + startingPoint);
+			}
+			System.out.println(ansSum + " " + ansLen);
 		}
 		s.close();
 	}

@@ -15,7 +15,10 @@
  * Note 2: Leading zeros should not be considered.
  * Note 3: If there are several solutions, choose the "lexicographically" smallest one (one sequence is 
  * considered "lexicographically" smaller than another if its first element which does not match the corresponding 
- * element in another sequence is smaller) */
+ * element in another sequence is smaller) 
+ * 
+ * INPUTS: 2 <= N <= 7, 1 <= K <= N, 1 <= L <= 8, space-separated N K L
+ * OUTPUT the L members of the family */
 
 import java.util.Scanner;
 
@@ -25,10 +28,10 @@ public class Euler051 {
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
-		int t = Integer.parseInt(s.nextLine());
-		for (int t0 = 0; t0 < t; t0++) {
-			
-		}
+		String[] inputs = s.nextLine().split(" ");
+		int n = Integer.parseInt(inputs[0]);
+		int k = Integer.parseInt(inputs[1]);
+		int l = Integer.parseInt(inputs[2]);
 		s.close();
 	}
 }

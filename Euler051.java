@@ -36,9 +36,14 @@ public class Euler051 {
 	 *
 	 * abcd=0000 is a tricky edge case (I think a, ab, abc, abcd = 0are all tricky for preserving 
 	 * lexicographically ordered checking). Cases where a=1 are also tricky, because all stars in front don't
-	 * give the lexicographically smallest. */
+	 * give the lexicographically smallest. 
+	 *
+	 * I'm thinking of writing a function that takes N and K and returns an array of boolean arrays that
+	 * represent arrangements of digits and stars. The array would contain N choose K arrays of length N, each
+	 * with K trues distributed throughout representing stars. */
 
 	final static int MAX = 10000000;
+	static int[] tenToThe;
 	static boolean[] composite;
 
 	/* Sieve primes up to MAX. */
@@ -52,9 +57,44 @@ public class Euler051 {
 			}
 		}
 	}
+
+	/* Fill powers of ten (up to 10^6 for 7-digit numbers). */
+	public static void fillTenToThe() {
+		tenToThe = new int[7];
+		tenToThe[0] = 1;
+		for (int i = 1; i < 7; i++) {
+			tenToThe[i] = tenToThe[i-1] * 10;
+		}
+	}
+
+	/* Generate all ways to arrange K trues and N-K falses. */
+	public static boolean[][] generateStarArrangements(int N, int K) {
+		boolean[][] ans = new boolean[choose(N,K)][N];
+		for (int i = 0; i < K; i++) ans[0][i] = true;
+
+		return ans;
+	}
+
+	/* Return N choose K, N >= K. */
+	public static int choose(int N, int K) {
+		int ans = 1;
+		for (int i = Math.max(N-K,K)+1; i <= N; i++) ans *= i;
+		for (int i = 2; i <= Math.min(K,N-K); i++) ans /= i;
+		return ans;
+	}
+
+	/* Once smallest lexicographic sequence of L primes is found, prints in format specified. */
+	public static void solution(int N, int K, int L) {
+
+	}
 	
 	public static void main(String[] args) {
 		sieve();
+		fillTenToThe();
+
+		System.out.println(choose(7,3));
+		System.exit(0);
+
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");
 		int n = Integer.parseInt(inputs[0]);

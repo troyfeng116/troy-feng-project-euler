@@ -121,9 +121,8 @@ public class Euler051 {
 
 		boolean solutionFound = false;
 		boolean[][] combs = generateStarArrangements(N,K);
-		/* For all possible N-K digit numbers */
+		/* For all possible (N-K) digit numbers */
 		for (int digits = 0; digits < tenToThe[N-K]; digits++) {
-			//System.out.println(digits);
 			/* For each way to arrange K stars and N-K digits */
 			for (boolean[] comb: combs) {
 				/* If digits ends in an even and star is at end and L > 5, it's impossible (only 5 odds). */
@@ -158,7 +157,7 @@ public class Euler051 {
 				int count = 0;
 				/* Add iterator and check for primality, stop loop once L primes found, or once the number of
 				 * primes yet to be found (L-count) exceeds the number of times we can increment by the iterator 
-				 *(10-count). */
+				 * (10-count). */
 				for (int i = start; i < 10 && L-count < 10-start && count < L; i++) {
 					if (!composite[toCheck]) count++;
 					toCheck+=iterator;

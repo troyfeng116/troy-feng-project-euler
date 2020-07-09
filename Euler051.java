@@ -53,6 +53,8 @@ public class Euler051 {
 	/* Sieve primes up to MAX. */
 	public static void sieve() {
 		composite = new boolean[MAX];
+		composite[0] = true;
+		composite[1] = true;
 		for (int i = 2; i < MAX; i++) {
 			if (!composite[i] && i <= Math.sqrt(MAX)) {
 				for (int j = i*i; j < MAX; j+=i) {
@@ -112,12 +114,65 @@ public class Euler051 {
 	/* Once smallest lexicographic sequence of L primes is found, prints in format specified. */
 	public static void solution(int N, int K, int L) {
 		boolean[][] combs = generateStarArrangements(N,K);
+		/* For all possible N-K digit numbers */
+		for (int digits = 0; digits < tenToThe[N-K]; digits++) {
+			//System.out.println(digits);
+			//System.out.println("Looped");
+			/* For each way to arrange K stars and N-K digits */
+			for (boolean[] comb: combs) {
+				/* If digits ends in an even and star is at end and L > 5, it's impossible (only 5 odds). */
+				if (digits % 2 == 0 && comb[N-1] && L > 5) continue;
+				/* If leading zero, star has to be in front. */
+				if (digits < tenToThe[N-K-1] && !comb[0]) continue;
+				int iterator = 0;
+				int smallest = 0;
+				int copy = digits;
+				for (int place = 0; place < N; place++) {
+					boolean isStar = comb[N-1-place];
+					if (isStar) {
+						iterator += tenToThe[place];
+					}
+					else {
+						smallest += (copy%10) * tenToThe[place];
+						copy /= 10;
+					}
+				}
+				System.out.println("Iterator: " + iterator);
+				System.out.println("Smallest: " + smallest);
+				int start = 0;
+				/* If leading zero and leading star, start from 1 not zero. */
+				if (smallest < tenToThe[N-1] && comb[0]) {
+					start++;
+					smallest += iterator;
+				}
+				int toCheck = smallest;
+				int count = 0;
+				for (int i = start; i < 10 /*&& L-count+i < 10*/ && count < L; i++) {
+					if (!composite[toCheck]) count++;
+					toCheck+=iterator;
+				}
+				if (count == L) {
+					int toPrint = smallest;
+					System.out.print(smallest);
+					int printed = !composite[toPrint] ? 1 : 0;
+					while (printed < L) {
+						toPrint += iterator;
+						if (!composite[toPrint]) {
+							System.out.print(" " + toPrint);
+							printed++;
+						}
+					}
+					System.out.println();
+					return;
+				}
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
 		sieve();
 		fillTenToThe();
-		boolean[][] test = generateStarArrangements(7,3);
+		/*boolean[][] test = generateStarArrangements(7,3);
 		for (int i = 0; i < test.length; i++) {
 			for (int j = 0; j < test[i].length; j++) {
 				if (test[i][j]) System.out.print(1 + " ");
@@ -126,13 +181,14 @@ public class Euler051 {
 			System.out.println();
 		}
 
-		System.exit(0);
+		System.exit(0);*/
 
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");
 		int n = Integer.parseInt(inputs[0]);
 		int k = Integer.parseInt(inputs[1]);
 		int l = Integer.parseInt(inputs[2]);
+		solution(n,k,l);
 		s.close();
 	}
 }

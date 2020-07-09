@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* By replacing the 1st digit of *3, it turns out that six of the nine possible values: 13, 23, 43, 53, 73, 
  * and 83 are all prime.
@@ -113,17 +113,22 @@ public class Euler051 {
 
 	/* Once smallest lexicographic sequence of L primes is found, prints in format specified. */
 	public static void solution(int N, int K, int L) {
+		String NNines = "";
+		for (int i = 0; i < N; i++) NNines += "9";
+		String ans = NNines;
+		for (int i = 1; i < L; i++) ans += " " + NNines;
+
+		boolean solutionFound = false;
 		boolean[][] combs = generateStarArrangements(N,K);
 		/* For all possible N-K digit numbers */
 		for (int digits = 0; digits < tenToThe[N-K]; digits++) {
 			//System.out.println(digits);
-			//System.out.println("Looped");
 			/* For each way to arrange K stars and N-K digits */
 			for (boolean[] comb: combs) {
 				/* If digits ends in an even and star is at end and L > 5, it's impossible (only 5 odds). */
 				if (digits % 2 == 0 && comb[N-1] && L > 5) continue;
 				/* If leading zero, star has to be in front. */
-				if (digits < tenToThe[N-K-1] && !comb[0]) continue;
+				if (N-K > 0 && digits < tenToThe[N-K-1] && !comb[0]) continue;
 				int iterator = 0;
 				int smallest = 0;
 				int copy = digits;
@@ -137,8 +142,9 @@ public class Euler051 {
 						copy /= 10;
 					}
 				}
-				System.out.println("Iterator: " + iterator);
-				System.out.println("Smallest: " + smallest);
+				//System.out.println("Iterator: " + iterator);
+				//System.out.println("Smallest: " + smallest);
+				if (smallest > Integer.parseInt(ans.substring(0,N))) continue;
 				int start = 0;
 				/* If leading zero and leading star, start from 1 not zero. */
 				if (smallest < tenToThe[N-1] && comb[0]) {
@@ -152,21 +158,29 @@ public class Euler051 {
 					toCheck+=iterator;
 				}
 				if (count == L) {
+					solutionFound = true;
+					String found = "";
 					int toPrint = smallest;
-					System.out.print(smallest);
-					int printed = !composite[toPrint] ? 1 : 0;
+					int printed = 0;
+					if (!composite[toPrint]) {
+						found += toPrint;
+						printed++;
+					}
+					//found += toPrint;
+					
 					while (printed < L) {
 						toPrint += iterator;
 						if (!composite[toPrint]) {
-							System.out.print(" " + toPrint);
+							found += printed==0 ? toPrint : " " + toPrint;
 							printed++;
 						}
 					}
-					System.out.println();
-					return;
+					ans = ans.compareTo(found) < 0 ? ans : found;
 				}
 			}
 		}
+		String finalAns = solutionFound ? ans : "NO SOLUTION";
+		System.out.println(finalAns);
 	}
 	
 	public static void main(String[] args) {

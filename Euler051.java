@@ -83,9 +83,9 @@ public class Euler051 {
 		return ans;
 	}
 
-	/* Given that arr1 holds some combination of T and F, stores next reverse lexicographical permutation of
-	 * T and F (T=1, F=0) in arr2. Pre-condition: arr2 is all F. ex. arr1 = 1110000 -> arr2 = 1101000, and
-	 * arr1 = 001011 -> arr2 = 000111. */
+	/* Given that arr1 holds some combination of T and F, place next reverse lexicographical permutation of
+	 * T and F (i.e. T=1, F=0) in arr2. Pre-condition: arr2 is initially all F. 
+	 * ex. arr1 = 1110000 -> arr2 = 1101000, and arr1 = 001011 -> arr2 = 000111. */
 	public static void nextCombination(boolean[] arr1, boolean[] arr2) {
 		int n = arr1.length;
 		int k = n-2;
@@ -113,6 +113,7 @@ public class Euler051 {
 
 	/* Once smallest lexicographic sequence of L primes is found, prints in format specified. */
 	public static void solution(int N, int K, int L) {
+		/* Set initial answer string */
 		String NNines = "";
 		for (int i = 0; i < N; i++) NNines += "9";
 		String ans = NNines;
@@ -129,6 +130,7 @@ public class Euler051 {
 				if (digits % 2 == 0 && comb[N-1] && L > 5) continue;
 				/* If leading zero, star has to be in front. */
 				if (N-K > 0 && digits < tenToThe[N-K-1] && !comb[0]) continue;
+				/* Build smallest member of N-K digits and iterator of 1s and 0s. */
 				int iterator = 0;
 				int smallest = 0;
 				int copy = digits;
@@ -142,21 +144,26 @@ public class Euler051 {
 						copy /= 10;
 					}
 				}
-				//System.out.println("Iterator: " + iterator);
-				//System.out.println("Smallest: " + smallest);
+				/* If smallest in this family is already greater than smallest found family, can't be solution
+				 * because of lexicographic order. */
 				if (smallest > Integer.parseInt(ans.substring(0,N))) continue;
 				int start = 0;
-				/* If leading zero and leading star, start from 1 not zero. */
+				/* If leading zero and leading star, start from 1*iterator not 0*iterator to preserve N digits. 
+				 * i.e. the entire family has only 9 members, not 10. */
 				if (smallest < tenToThe[N-1] && comb[0]) {
 					start++;
 					smallest += iterator;
 				}
 				int toCheck = smallest;
 				int count = 0;
-				for (int i = start; i < 10 /*&& L-count+i < 10*/ && count < L; i++) {
+				/* Add iterator and check for primality, stop loop once L primes found, or once the number of
+				 * primes yet to be found (L-count) exceeds the number of times we can increment by the iterator 
+				 *(10-count). */
+				for (int i = start; i < 10 && L-count < 10-start && count < L; i++) {
 					if (!composite[toCheck]) count++;
 					toCheck+=iterator;
 				}
+				/* If we've found an L-prime family, build string. */
 				if (count == L) {
 					solutionFound = true;
 					String found = "";
@@ -165,9 +172,7 @@ public class Euler051 {
 					if (!composite[toPrint]) {
 						found += toPrint;
 						printed++;
-					}
-					//found += toPrint;
-					
+					}					
 					while (printed < L) {
 						toPrint += iterator;
 						if (!composite[toPrint]) {
@@ -186,16 +191,6 @@ public class Euler051 {
 	public static void main(String[] args) {
 		sieve();
 		fillTenToThe();
-		/*boolean[][] test = generateStarArrangements(7,3);
-		for (int i = 0; i < test.length; i++) {
-			for (int j = 0; j < test[i].length; j++) {
-				if (test[i][j]) System.out.print(1 + " ");
-				else System.out.print(0 + " ");
-			}
-			System.out.println();
-		}
-
-		System.exit(0);*/
 
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");

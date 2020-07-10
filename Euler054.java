@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* In the card game poker, a hand consists of five cards and are ranked, from lowest to highest, in the 
  * following way:
@@ -26,7 +26,7 @@
  * 
  * Consider the following five hands dealt to two players:
  *
- * 	Hand 	Player1				Player2				Winner		
+ * 	HAND 	PLAYER1				PLAYER2				WINNER		
  * 	1		5H 5C 6S 7S KD 		2C 3S 8S 8D TD 		Player2
  * 			Pair of 5s 			Pair of 8s 			
  * 	2		5D 8C 9S JS AC 		2C 5C 7D 8S QH		Player1
@@ -73,13 +73,16 @@ public class Euler054 {
 	 *
 	 * For a hand of 5 cards, we first assign it a baseline score, and then add the highest card.
 	 *
-	 * We can check suits first for flush/straight flush/royal flush; if we find a flush, there can be no
-	 * repeated cards, and the minimum score is 500.
+	 * Important information we will need to store includes the most frequent rank, the highest rank, and
+	 * counts of the most frequent and second most frequent ranks. This is all we need to determine the
+	 * type of hand to assign it a bracket score.
 	 *
 	 * To process an array (hand) of five rank/suit strings, I think creating an int[] countRanks of size
 	 * 15, where countRanks[rank] returns the count of rank in a hand, might be a good way to proceed. The
-	 * size is 15 instead of 14 because Ace count will be storeed in both 1 and 14, so we can detect A-5
-	 * flush but preserve high rank of A. */
+	 * size is 15 instead of 14 because Ace count will be stored in both 1 and 14, so we can detect A-5
+	 * flush but preserve high rank of A. An example of our mapping: hand 2C 2D 5C 5D 9S gets a score of
+	 * 209, because we assign 200 for two pairs + 9 for highest card.  This mapping will sometimes tie,
+	 * so a highest card tiebreak will be needed. */
 
 	/* map.get(key) returns the score associated with that kind of hand. ex. map.get("TOK") retrieves 300,
 	 * the score we have given to "three of a kind." */
@@ -191,25 +194,29 @@ public class Euler054 {
 				else if (countRanks[rank] > secondHighCount) secondHighCount = countRanks[rank];
 			}
 		}
+		/* If highest rank frequency is one, we have possibility of straight and/or flush. */
 		if (highCount == 1) {
 			boolean flush = isFlush(p);
 			boolean straight = isStraight(countRanks, highest);
 			/* Special A-5 straight case. */
-			if (straight && countRanks[2] == 1) highest = 5;
+			if (straight && highest == 14 && countRanks[2] == 1) highest = 5;
 			if (flush && straight && highest == 14) return score.get("RF");
 			if (flush && straight) return score.get("SF") + highest;
 			if (flush) return score.get("F") + highest;
 			if (straight) return score.get("S") + highest; 
 			return score.get("HC") + highest;
 		}
+		/* If highest rank frequency is two, we can have one or two pairs. */
 		if (highCount == 2) {
 			if (secondHighCount == 2) return score.get("TP") + mostFreq;
 			return score.get("OP") + mostFreq;
 		}
+		/* If highest rank frequency is three, we can have three of a kind of full house. */
 		if (highCount == 3) {
 			if (secondHighCount == 2) return score.get("FH") + mostFreq;
 			return score.get("TOK") + mostFreq;
 		}
+		/* If highest rank frequency is four, we can only have four of a kind. */
 		return score.get("FOK") + mostFreq;
 	}
 
@@ -218,12 +225,9 @@ public class Euler054 {
 	public static String winning(String[] p1, String[] p2) {
 		int score1 = getScore(p1);
 		int score2 = getScore(p2);
-		System.out.println(score1);
-		System.out.println(score2);
 		if (score1 > score2) return "Player 1";
 		if (score1 < score2) return "Player 2";
-		// Tiebreak.
-		int ignore = score1 % 100;
+		/* Tiebreak. */
 		int[] countRanks1 = countRanks(p1);
 		int[] countRanks2 = countRanks(p2);
 		int rank = 14;

@@ -35,7 +35,7 @@
  *			Three A 			Flush in Diamonds	
  * 	4		4D 6S 9H QH QC		3D 6D 7H QD QS 		Player1
  *			Pair of Q 			Pair of Q
- * 			Highest card 9 		Highets card 7
+ * 			Highest card 9 		Highest card 7
  *	5		2H 2D 4C 4D 4S 		3C 3D 3S 9S 9D 		Player1
  * 			Full House			Full House
  * 			With Three Fours	With Three Threes
@@ -99,46 +99,6 @@ public class Euler054 {
 		score.put("RF",900);
 	}
 
-	/* Return the score assigned to hand p, where first we assign a score based on the type of hand and
-	 * our score table (i.e. if full house, then we assign score.get("FH") = 600). Then we add the
-	 * highest card for comparison. */
-	public static int getScore(String[] p) {
-		int[] countRanks = countRanks(p);
-		int highCount = 1; /* Count of most frequent rank. */
-		int secondHighCount = 1; /* Count of second most frequent rank. */
-		int highest = 0; /* Highest rank. */
-		int mostFreq = 0; /* Most frequently appearing rank. */
-		for (int rank = 2; rank < countRanks.length; rank++) {
-			if (countRanks[rank] != 0) {
-				highest = rank;
-				if (countRanks[rank] >= highCount) {
-					mostFreq = rank;
-					secondHighCount = highCount;
-					highCount = countRanks[rank];
-				}
-				if (countRanks[rank] > secondHighCount) secondHighCount = countRanks[rank];
-			}
-		}
-		if (highCount == 1) {
-			// Check F, store in boolean.
-			// Check S (careful of A-5; check for T-A, then A-5), store in boolean.
-			// This deals with HC, S, F, SF, and RF.
-			return 0;
-		}
-		if (highCount == 2) {
-			// Check TP.
-			// Else OP.
-			return 0;
-		}
-		if (highCount == 3) {
-			// Check FH.
-			// Check TOK 
-			return 0;
-		}
-		// check FOK.
-		return 0;
-	}
-
 	/* Return a count of each rank in hand p. i.e. if hand were [2, 2, 2, 3, 3], return 
 	 * [0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. Note that the length is 15 and not 14, because
 	 * of the Ace as a special exception, which is stored in both 1 and 14, so that we can detect 
@@ -181,11 +141,98 @@ public class Euler054 {
 		return ans;
 	}
 
-	/* Given p1 and p2 representing two players' poker hands, return 1 or 2 if player 1 or player 2 has
-	 * the winning hand, respectively. */
-	public static int winning(String[] p1, String[] p2) {
+	/* Return true if hand (in count-of-ranks array form) is a straight, false else. */
+	public static boolean isStraight(int[] countRanks, int highest) {
+		boolean straight = true;
+		for (int i = highest; i > highest-5; i--) {
+			if (countRanks[i] == 0) {
+				straight = false;
+				break;
+			}
+		}
+		if (straight) return true;
+		if (highest == 14) {
+			for (int i = 1; i <= 5; i++) if (countRanks[i] == 0) return false;
+			return true;
+		}
+		return false;
+	}
 
-		return 1;
+	/* Return true if hand p is a flush, false else. */
+	public static boolean isFlush(String[] p) {
+		boolean flush = true;
+		char suit = p[0].charAt(1);
+		for (int i = 1; i < p.length; i++) {
+			if (p[i].charAt(1) != suit) {
+				flush = false;
+				break;
+			}
+		}
+		return flush;
+	}
+
+	/* Return the score assigned to hand p, where first we assign a score based on the type of hand and
+	 * our score table (i.e. if full house, then we assign score.get("FH") = 600). Then we add the
+	 * highest card for comparison. */
+	public static int getScore(String[] p) {
+		int[] countRanks = countRanks(p);
+		int highCount = 1; /* Count of most frequent rank. */
+		int secondHighCount = 1; /* Count of second most frequent rank. */
+		int highest = 0; /* Highest rank. */
+		int mostFreq = 0; /* Most frequently appearing rank. */
+		for (int rank = 2; rank < countRanks.length; rank++) {
+			if (countRanks[rank] != 0) {
+				highest = rank;
+				if (countRanks[rank] >= highCount) {
+					mostFreq = rank;
+					secondHighCount = highCount;
+					highCount = countRanks[rank];
+				}
+				else if (countRanks[rank] > secondHighCount) secondHighCount = countRanks[rank];
+			}
+		}
+		if (highCount == 1) {
+			boolean flush = isFlush(p);
+			boolean straight = isStraight(countRanks, highest);
+			/* Special A-5 straight case. */
+			if (straight && countRanks[2] == 1) highest = 5;
+			if (flush && straight && highest == 14) return score.get("RF");
+			if (flush && straight) return score.get("SF") + highest;
+			if (flush) return score.get("F") + highest;
+			if (straight) return score.get("S") + highest; 
+			return score.get("HC") + highest;
+		}
+		if (highCount == 2) {
+			if (secondHighCount == 2) return score.get("TP") + mostFreq;
+			return score.get("OP") + mostFreq;
+		}
+		if (highCount == 3) {
+			if (secondHighCount == 2) return score.get("FH") + mostFreq;
+			return score.get("TOK") + mostFreq;
+		}
+		return score.get("FOK") + mostFreq;
+	}
+
+	/* Given p1 and p2 representing two players' poker hands, return "Player 1" or "Player 2" if player 1 
+	 * or player 2 has the winning hand, respectively. */
+	public static String winning(String[] p1, String[] p2) {
+		int score1 = getScore(p1);
+		int score2 = getScore(p2);
+		System.out.println(score1);
+		System.out.println(score2);
+		if (score1 > score2) return "Player 1";
+		if (score1 < score2) return "Player 2";
+		// Tiebreak.
+		int ignore = score1 % 100;
+		int[] countRanks1 = countRanks(p1);
+		int[] countRanks2 = countRanks(p2);
+		int rank = 14;
+		while (rank >= 0) {
+			if (countRanks1[rank] > countRanks2[rank]) return "Player 1";
+			if (countRanks1[rank] < countRanks2[rank]) return "Player 2";
+			rank--;
+		}
+		return "NEITHER";
 	}
 	
 	public static void main(String[] args) {
@@ -193,13 +240,14 @@ public class Euler054 {
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
-			String[] inputs = s.nextLine().split("");
+			String[] inputs = s.nextLine().split(" ");
 			String[] player1 = new String[5];
 			String[] player2 = new String[5];
 			for (int i = 0; i < 5; i++) {
 				player1[i] = inputs[i];
-				player2[i+5] = inputs[i+5];
+				player2[i] = inputs[i+5];
 			}
+			System.out.println(winning(player1, player2));
 		}
 		s.close();
 	}

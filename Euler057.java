@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* It is possible to show that the square root of two can be expressed as an infinite continued fraction.
  * 
@@ -28,10 +28,23 @@ public class Euler057 {
 	 * is equal to 1 + 1/(1 + a/b) = 1 + 1/((a+b)/b) = 1 + b/(a+b) = (a+2b)/(a+b). So if we start with a=1 and
 	 * b=1, and iterate by a+=2b and b+=a, we'll generate the sequence of numerator and denominator without
 	 * having to actuall deal with any fractions and GCDs and whatnot. As the numerator and denominator can
-	 * get pretty big, we'll use BigInteger to avoid headache.
+	 * get pretty big, we'll use BigInteger to avoid headache. As String.length() is not efficient, we can
+	 * write a more efficient method to count the digits of a BigInteger.
 	 *
 	 * As a side note, continued fractions in general are super interesting: 
 	 * https://en.wikipedia.org/wiki/Continued_fraction */
+
+	/* An efficient way to count the digits of a BigInteger. BigInteger.bitLength() is much faster than
+	 * String.length(), and BigInteger.pow is also quite fast. Note log2(n) = log10(n)/log10(2). Thus,
+	 * log2(n) * log_10(2) = log_10(n) -> bitLength * log(10)/log(2) ~ digits. */
+	public static int numDigits(BigInteger n) {
+		double convert = Math.log(2) / Math.log(10);
+  		int digits = (int) (convert * n.bitLength() + 1);
+  		if (BigInteger.TEN.pow(digits-1).compareTo(n) > 0) {
+    		return digits-1;
+  		}
+  		return digits;
+	}
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
@@ -40,7 +53,8 @@ public class Euler057 {
 		BigInteger b = BigInteger.ONE;
 		BigInteger twoConst = new BigInteger("2");
 		for (int iteration = 0; iteration <= n; iteration++) {
-			if (a.toString().length() > b.toString().length()) {
+			//System.out.println(a.toString() + " " + b.toString());
+			if (numDigits(a) > numDigits(b)) {
 				System.out.println(iteration);
 			}
 			a = a.add(b.multiply(twoConst));

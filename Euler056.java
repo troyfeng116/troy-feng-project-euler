@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* A googol 10^100 is a massive number: one followed by one-hundred zeros. 100^100 is almost unimaginably 
  * large: one followed by two-hundred zeros. Despite their size, the sum of the digits in each number is 
@@ -31,6 +31,7 @@ public class Euler056 {
 	/* Return int[] corresponding to multiplying array-of-digits representation of n by d*10^k, i.e.
 	 * multiplying n by d<9 and then multiply by 10^k. All array-of-digits notation is reversed. */
 	public static int[] multiplyOneDigit(int[] n, int d, int k) {
+		if (d == 0) return new int[] {0};
 		int[] ans = new int[n.length+k];
 		int carry = 0;
 		for (int i = k; i < ans.length; i++) {
@@ -75,20 +76,15 @@ public class Euler056 {
 		return ans;
 	}
 
-	/* Multiply a by k, where k < 200. */
-	public static int[] multiply(int[] a, int k) {
-		int[] ans = multiplyOneDigit(a, k%10, 0);
-		if (k >= 10) ans = add(ans, multiplyOneDigit(ans, (k/10)%10, 1));
-		if (k >= 100) ans = add(ans, multiplyOneDigit(ans, k/100, 2));
+	/* Multiply a by num, where num < 200. */
+	public static int[] multiply(int[] a, int num) {
+		int[] ans = multiplyOneDigit(a, num%10, 0);
+		if (num >= 10) ans = add(ans, multiplyOneDigit(a, (num/10)%10, 1));
+		if (num >= 100) ans = add(ans, multiplyOneDigit(a, num/100, 2));
 		return ans;
 	}
 	
 	public static void main(String[] args) {
-		int[] test = new int[] {1,2,3};
-		int[] res = multiply(test, 10);
-		for (int i: res) System.out.print(i);
-		System.out.println();
-		System.exit(0);
 		Scanner s = new Scanner(System.in);
 		int n = Integer.parseInt(s.nextLine());
 		/* table[i][j] holds i^j in array-of-digits form. We will ignore the first 2 rows, as 0^j and 1^j

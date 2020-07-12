@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Starting with 1 and spiralling anticlockwise in the following way, a square spiral with side length 7 is 
  * formed.
@@ -27,16 +27,81 @@ public class Euler058 {
 	
 	/* Thoughts/approach: I remember there was another Project Euler question involving the sums of numbers
 	 * along the diagonals. It seems that we might have to loop pretty far, and a simple sieve won't do;
-	 * chances are we'll have to implement a fast primality test like Miller-Rabin.
+	 * we'll have to implement a fast primality test like Miller-Rabin in addition to a sieve.
 	 *
 	 * For any (odd) side length n, we can find the four numbers on the corners of the n x n square pretty
 	 * quickly (bottom left is n^2). We then have to check the primality of each of those four corners.
 	 * Trivially, the bottom left corner can't be prime. */
+
+	/* Return a^pow % mod. */
+	public static long pow(long a, long pow, long mod) {
+		if (pow == 1) return a%mod;
+		long half = pow(a,pow/2,mod);
+		long ans = mult(half,half,mod);
+		if (pow%2 == 1) ans = mult(ans,a,mod);
+		return ans%mod;
+	}
+
+	/* Return a*b % mod. */
+	public static long mult(long a, long b, long mod) {
+		long x = (long) (((double) a*b)/mod);
+		long ans = (a*b-x*mod);
+		return ans<0 ? ans+mod : ans;
+	}
+
+	/* Miller-Rabin primality test. */
+	public static boolean isPrime(long n, int k) {
+		if (n%2 == 0 || n%3 == 0 || n%5 == 0) return false;
+		long d = n-1;
+		int s = 0;
+		while (d%2 == 0) {
+			d/=2;
+			s++;
+		}
+		for (int iter = 0; iter < k; iter++) {
+			boolean witness = false;
+			long a = 2 + ((long) (Math.random() * (n-3)));
+			long x = pow(a,d,n);
+			if (x == 1 || x == n-1) continue;
+			for (int i = 0; i < s-1; i++) {
+				x = mult(x,x,n);
+				if (x == n-1) {
+					witness = true;
+					break;
+				}
+			}
+			if (witness) continue;
+			else return false;
+		}
+		return true;
+	}
+
+	/* Return first side length for which ratio of number of primes on diagonals to total numbers on diagonals
+	 * falls below N/100. */
+	public static int solution(int N) {
+		/* Base case for side length = 3: 5 total on diagonals and 3 primes. */
+		int numPrimes = 3;
+		int numTotal = 5;
+		long sideLen = 3;
+		while (numPrimes*100 >= N*numTotal) {
+			sideLen+=2;
+			long bottomLeft = sideLen*sideLen;
+			long side1 = bottomLeft - (sideLen-1);
+			long side2 = side1 - (sideLen-1);
+			long side3 = side2 - (sideLen-1);
+			if (isPrime(side1,5)) numPrimes++;
+			if (isPrime(side2,5)) numPrimes++;
+			if (isPrime(side3,5)) numPrimes++;
+			numTotal+=4;
+		}
+		return (int) sideLen;
+	}
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int n = Integer.parseInt(s.nextLine());
-		
+		int ans = solution(n);
+		System.out.println(ans);
 		s.close();
 	}
 }

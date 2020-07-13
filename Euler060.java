@@ -13,6 +13,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Arrays;
 
 public class Euler060 {
 	
@@ -33,36 +34,66 @@ public class Euler060 {
 	 * bode well for searching for K = 3, 4, or 5 using the method described above.  
 	 *
 	 * We are definitely wasting a lot of time in checking certain pairs more than once; would memoizing
-	 * pairs work (since there are 47673 pairs)? */
+	 * pairs work (since there are 47673 pairs)? Because then we could loop through the 47673 pairs and
+	 * binary search for the next prime.
+	 *
+	 * A nice observation: All pairs are equivalent mod 3 with the exception of those including 3 itself.
+	 * i.e. p1 and p2 can only be a concatenable pair if p1 and p2 are equivalent mod 3. This is because
+	 * a number is equivalent to the sum of its digits mod 3.  */
 
 	static final int MAX_N = 20000;
 	static final int[] tenToThe = new int[] {1,10,100,1000,10000,100000};
 	static boolean[] composite;
-	/* prime[k] retrieves the k'th prime (0-based). i.e. prime[0] = 2, prime[1] = 3, ... */
+	/* prime1[k] retrieves the k'th prime equiv to 1%3 (0-based). i.e. prime1[0] = 7, prime[1] = 13, ... */
+	static int[] prime1;
+	/* prime1[k] retrieves the k'th prime equiv to 2%3 (0-based), not including 5. i.e. prime1[0] = 11, 
+	 * prime[1] = 17, ... */
+	static int[] prime2;
+	/* prime[k] retrieves the k'th prime (zero-based). i.e. prime[0] = 2, prime[1] = 3, ... */
 	static int[] prime;
 	/* Precomputed number of pairs of primes that, when concatenated, are prime. */
 	static final int NUM_PAIRS = 47673;
 	/* Holds the pairs of primes in sorted order. */
 	static int[][] pairs;
 
-	/* Sieve primes up to 50000000, and fill in-order mapping of k to k'th prime in prime[]. */
+	/* Sieve primes up to 40000000, and fill in-order mappings of k to k'th prime equiv to 1%3 or 2%3 in 
+	 * prime1 and prime2, respectively. */
 	public static void sieve() {
-		composite = new boolean[50000001];
+		composite = new boolean[40000001];
 		/* Sieve primes <= MAX_N. */
-		int count = 0;
+		int count1 = 0;
+		int count2 = 0;
 		for (int i = 2; i <= MAX_N; i++) {
 			if (!composite[i]) {
-				count++;
+				if (i%3==1) count1++;
+				else if (i%3==2 && i>5) count2++;
 				for (int j = i*i; j < composite.length; j+=i) {
 					composite[j] = true;
 				}
 			}
 		}
-		prime = new int[count];
-		int index = 0;
-		for (int x = 2; x <= MAX_N; x++) {
+		prime = new int[count1+count2+3];
+		prime[0] = 2;
+		prime[1] = 3;
+		prime[2] = 5;
+		prime[3] = 7;
+		int index = 4;
+		prime1 = new int[count1];
+		prime2 = new int[count2];
+		prime1[0] = 7;
+		int index1 = 1;
+		int index2 = 0;
+		for (int x = 11; x <= MAX_N; x+=6) {
 			if (!composite[x]) {
+				prime2[index2] = x;
+				index2++;
 				prime[index] = x;
+				index++;
+			}
+			if (x+2 <= MAX_N && !composite[x+2]) {
+				prime1[index1] = x+2;
+				index1++;
+				prime[index] = x+2;
 				index++;
 			}
 		}
@@ -115,6 +146,7 @@ public class Euler060 {
 		return true;
 	}
 
+	/* Generate all concatenable prime pairs and store in sorted order using prime1 and prime2. */
 	public static void fillPairs() {
 		pairs = new int[NUM_PAIRS][2];
 		int index = 0;
@@ -126,17 +158,59 @@ public class Euler060 {
 				index++;
 			}
 		}
-		for (int i = 3; i < prime.length-1; i++) {
-			int p1 = prime[i];
-			for (int j = i+1; j < prime.length; j++) {
-				int p2 = prime[j];
-				if (isPrime(concat(p1,p2)) && isPrime(concat(p2,p1))) {
-					pairs[index][0] = p1;
-					pairs[index][1] = p2;
+		int i1 = 0;
+		int i2 = 0;
+		while (i1 < prime1.length && i2 < prime2.length) {
+			if (prime1[i1] < prime2[i2]) {
+				int a = prime1[i1];
+				for (int j = i1+1; j < prime1.length; j++) {
+					int b = prime1[j];
+					if (isPrime(concat(a,b)) && isPrime(concat(b,a))) {
+						pairs[index][0] = a;
+						pairs[index][1] = b;
+						index++;
+					}
+				}
+				i1++;
+			}
+			else {
+				int a = prime2[i2];
+				for (int j = i2+1; j < prime2.length; j++) {
+					int b = prime2[j];
+					if (isPrime(concat(a,b)) && isPrime(concat(b,a))) {
+						pairs[index][0] = a;
+						pairs[index][1] = b;
+						index++;
+					}
+				}
+				i2++;
+			}
+		}
+		while (i1 < prime1.length) {
+			int a = prime1[i1];
+			for (int j = i1+1; j < prime1.length; j++) {
+				int b = prime1[j];
+				if (isPrime(concat(a,b)) && isPrime(concat(b,a))) {
+					pairs[index][0] = a;
+					pairs[index][1] = b;
 					index++;
 				}
 			}
+			i1++;
 		}
+		while (i2 < prime2.length) {
+			int a = prime2[i2];
+			for (int j = i2+1; j < prime2.length; j++) {
+				int b = prime2[j];
+				if (isPrime(concat(a,b)) && isPrime(concat(a,b))) {
+					pairs[index][0] = a;
+					pairs[index][1] = b;
+					index++;
+				}
+			}
+			i2++;
+		}
+			
 	}
 
 	/* Return concatenation of n1 and n2. */
@@ -145,37 +219,24 @@ public class Euler060 {
 		//return Long.parseLong(Integer.toString(n1) + Integer.toString(n2));
 	}
 
-	/* Given list of primes so far, number of primes used so far, sum of primes used so far, an index start 
-	 * at which to start testing next prime (from prime[start]), max N, target number of primes K, and list 
-	 * of sums of good K primes, extend solution. */
-	public static void extend(List<Integer> soFar, int used, int sum, int start, int N, int K, List<Integer> ans) {
-		if (used == K) {
-			ans.add(sum);
-			/*for (int i = 0; i < soFar.size(); i++) System.out.print(soFar.get(i) + " ");
-			System.out.println();*/
-			return;
-		}
-		for (int i = start; i < prime.length && prime[i] < N; i++) {
-			int p = prime[i];
-			boolean works = true;
-			for (int j = 0; j < used; j++) {
-				int toTest = soFar.get(j);
-				if (!isPrime(concat(p,toTest)) || !isPrime(concat(toTest,p))) {
-					works = false;
-					break;
-				}
-			}
-			if (works) {
-				soFar.add(p);
-				extend(soFar, used+1, sum+p, i+1, N, K, ans);
-				soFar.remove(used);
-			}
-		}
+	/* Search for key k in pairs[][]. Since pairs is sorted, return first index at which k occurs or -1. */
+	public static int search(int k, int l, int r) {
+		if (l > r) return -1;
+		int m = (l+r)/2;
+		if (k < pairs[m][0]) return search(k,l,m-1);
+		if (k > pairs[m][0]) return search(k,m+1,r);
+		while (m > 0 && pairs[m][0] == k) m--;
+		return m;
+	}
+
+	/* Given the sum of primes in set so far, the next prime to search, and the target number K, return sum
+	 * of all solutions including next prime. */
+	public static void getSums(int soFar, int nextPrime, int K, List<Integer> ans) {
+
 	}
 
 	public static List<Integer> solution(int N, int K) {
 		List<Integer> ans = new ArrayList<Integer>();
-		extend(new ArrayList<Integer>(), 0, 0, 1, N, K, ans);
 		return ans;
 	}
 	

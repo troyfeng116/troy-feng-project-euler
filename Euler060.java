@@ -55,11 +55,13 @@ public class Euler060 {
 	static final int NUM_PAIRS = 47673;
 	/* Holds the pairs of primes in sorted order. */
 	static int[][] pairs;
+	/* numPairsWith[k] holds the number of pairs where k is the first in the pair. */
+	static int[] numPairsWith;
 
-	/* Sieve primes up to 40000000, and fill in-order mappings of k to k'th prime equiv to 1%3 or 2%3 in 
+	/* Sieve primes up to 20000000, and fill in-order mappings of k to k'th prime equiv to 1%3 or 2%3 in 
 	 * prime1 and prime2, respectively. */
 	public static void sieve() {
-		composite = new boolean[40000001];
+		composite = new boolean[20000001];
 		/* Sieve primes <= MAX_N. */
 		int count1 = 0;
 		int count2 = 0;
@@ -142,7 +144,6 @@ public class Euler060 {
 			if (witness) continue;
 			return false;
 		}
-		//System.out.println(n + " is prime");
 		return true;
 	}
 
@@ -210,7 +211,19 @@ public class Euler060 {
 			}
 			i2++;
 		}
-			
+	}
+
+	/* Fill numPairsWith with how many times each prime appears as first in pairs. */
+	public static void fillNumPairsWith() {
+		numPairsWith = new int[MAX_N+1];
+		for (int i = 0; i < pairs.length-1; i++) {
+			int count = 1;
+			while (i < pairs.length-1 && pairs[i][0] == pairs[i+1][0]) {
+				count++;
+				i++;
+			}
+			numPairsWith[pairs[i][0]] = count;
+		}
 	}
 
 	/* Return concatenation of n1 and n2. */
@@ -246,10 +259,12 @@ public class Euler060 {
 		long time1 = System.currentTimeMillis();
 		fillPairs();
 		long time2 = System.currentTimeMillis();
+		fillNumPairsWith();
 		for (int i = 0; i < pairs.length; i++) {
 			System.out.println(pairs[i][0] + " " + pairs[i][1]);
 		}
-		System.out.println("TIME SIEVE: " + (time1 - time) + "TIME PAIRS: " + (time2 - time1));
+		System.out.println("TIME SIEVE: " + (time1 - time) + " TIME PAIRS: " + (time2 - time1));
+		System.out.println(numPairsWith[4157]);
 
 		System.exit(0);
 

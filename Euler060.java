@@ -23,17 +23,27 @@ public class Euler060 {
 	 * of four primes with those three primes. Once we find four, we then extend to five. We would have to
 	 * keep a list of primes that work so far. When trying to extend a set S of k primes, consider the k+1'th
 	 * prime p. For all S[i], p concat S[i] and S[i] concat p must be prime for us to be able to extend S to
-	 * include p.
+	 * include p. After searching, we backtrack.
 	 *
 	 * As for concatenation of two integers, string concatenation would work but perhaps counting digits and
 	 * adding n1*10^numDigits to n2 might be better? 
 	 *
-	 * */
+	 * EDIT: After playing around, I found that there are 47673 PAIRS of primes less than 20000 that, when
+	 * concatenated with each other, form another prime by inputting N=20000 and K=2 (!). This does not 
+	 * bode well for searching for K = 3, 4, or 5 using the method described above.  
+	 *
+	 * We are definitely wasting a lot of time in checking certain pairs more than once; would memoizing
+	 * pairs work (since there are 47673 pairs)? */
 
 	static final int MAX_N = 20000;
+	static final int[] tenToThe = new int[] {1,10,100,1000,10000,100000};
 	static boolean[] composite;
 	/* prime[k] retrieves the k'th prime (0-based). i.e. prime[0] = 2, prime[1] = 3, ... */
 	static int[] prime;
+	/* Precomputed number of pairs of primes that, when concatenated, are prime. */
+	static final int NUM_PAIRS = 47673;
+	/* Holds the pairs of primes in sorted order. */
+	static int[][] pairs;
 
 	/* Sieve primes up to upTo, and fill in-order mapping of k to k'th prime in prime[]. */
 	public static void sieve(int upTo) {
@@ -106,9 +116,34 @@ public class Euler060 {
 		return true;
 	}
 
+	public static void fillPairs() {
+		pairs = new int[NUM_PAIRS][2];
+		int index = 0;
+		for (int j = 3; j < prime.length; j++) {
+			int p = prime[j];
+			if (isPrime(concat(3,p)) && isPrime(concat(p,3))) {
+				pairs[index][0] = 3;
+				pairs[index][1] = p;
+				index++;
+			}
+		}
+		for (int i = 3; i < prime.length-1; i++) {
+			int p1 = prime[i];
+			for (int j = i+1; j < prime.length; j++) {
+				int p2 = prime[j];
+				if (isPrime(concat(p1,p2)) && isPrime(concat(p2,p1))) {
+					pairs[index][0] = p1;
+					pairs[index][1] = p2;
+					index++;
+				}
+			}
+		}
+	}
+
 	/* Return concatenation of n1 and n2. */
 	public static long concat(int n1, int n2) {
-		return Long.parseLong(Integer.toString(n1) + Integer.toString(n2));
+		return (long) tenToThe[(int) Math.log10(n2)+1]*n1 + n2;
+		//return Long.parseLong(Integer.toString(n1) + Integer.toString(n2));
 	}
 
 	/* Given list of primes so far, number of primes used so far, sum of primes used so far, an index start 
@@ -147,11 +182,15 @@ public class Euler060 {
 	
 	public static void main(String[] args) {
 		sieve(MAX_N);
-		System.out.println(prime.length);
-		System.out.println(isPrime(17));
-		System.out.println(isPrime(101));
-		System.out.println(isPrime(97*97));
-		//System.exit(0);
+		long time = System.currentTimeMillis();
+		fillPairs();
+		long time2 = System.currentTimeMillis();
+		for (int i = 0; i < pairs.length; i++) {
+			System.out.println(pairs[i][0] + " " + pairs[i][1]);
+		}
+		System.out.println("TIME: " + (time2 - time));
+
+		System.exit(0);
 
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");

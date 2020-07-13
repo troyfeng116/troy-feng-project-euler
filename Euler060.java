@@ -45,26 +45,25 @@ public class Euler060 {
 	/* Holds the pairs of primes in sorted order. */
 	static int[][] pairs;
 
-	/* Sieve primes up to upTo, and fill in-order mapping of k to k'th prime in prime[]. */
-	public static void sieve(int upTo) {
-		composite = new boolean[upTo+1];
+	/* Sieve primes up to 50000000, and fill in-order mapping of k to k'th prime in prime[]. */
+	public static void sieve() {
+		composite = new boolean[50000001];
+		/* Sieve primes <= MAX_N. */
 		int count = 0;
-		for (int i = 2; i <= upTo; i++) {
+		for (int i = 2; i <= MAX_N; i++) {
 			if (!composite[i]) {
 				count++;
-				if (i <= Math.sqrt(upTo)) {
-					for (int j = i*i; j <= upTo; j+=i) {
-						composite[j] = true;
-					}
+				for (int j = i*i; j < composite.length; j+=i) {
+					composite[j] = true;
 				}
 			}
 		}
 		prime = new int[count];
-		int i = 0;
-		for (int x = 2; x <= upTo; x++) {
+		int index = 0;
+		for (int x = 2; x <= MAX_N; x++) {
 			if (!composite[x]) {
-				prime[i] = x;
-				i++;
+				prime[index] = x;
+				index++;
 			}
 		}
 	}
@@ -89,7 +88,7 @@ public class Euler060 {
 	 * a = 2, 3, 5, and 7
 	 * ( https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test ) */
 	public static boolean isPrime(long n) {
-		if (n <= MAX_N) return !composite[(int) n];
+		if (n < composite.length) return !composite[(int) n];
 		if (n%3 == 0 || n%5 == 0) return false;
 		long d = n-1;
 		int s = 0;
@@ -181,14 +180,15 @@ public class Euler060 {
 	}
 	
 	public static void main(String[] args) {
-		sieve(MAX_N);
 		long time = System.currentTimeMillis();
+		sieve();
+		long time1 = System.currentTimeMillis();
 		fillPairs();
 		long time2 = System.currentTimeMillis();
 		for (int i = 0; i < pairs.length; i++) {
 			System.out.println(pairs[i][0] + " " + pairs[i][1]);
 		}
-		System.out.println("TIME: " + (time2 - time));
+		System.out.println("TIME SIEVE: " + (time1 - time) + "TIME PAIRS: " + (time2 - time1));
 
 		System.exit(0);
 

@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- UNSOLVED 92.86/100 -------- */
 
 /* The primes 3, 7, 109, and 673, are quite remarkable. By taking any two primes and concatenating them 
  * in any order the result will always be prime. For example, taking 7 and 109, both 7109 and 1097 are prime.
@@ -44,30 +44,29 @@ public class Euler060 {
 	 *
 	 * Say we're looking for K-tuples whose least prime is 3. We look at all sets of K pairs whose first
 	 * prime is 3, say (3,p1), (3,p2), and (3,p3). Then (p1,p2), (p1,p3), and (p2,p3) must all also be
-	 * valid prime pairs. We can binary search for those. 
-	 *
-	 * Finally, I think I'm going to write separate functions for K=3, 4, and 5. Recursion would take
-	 * too long if K isn't fixed. */
+	 * valid prime pairs. We can binary search for those. */
 
 	static final int MAX_N = 20000;
 	static final int[] tenToThe = new int[] {1,10,100,1000,10000,100000};
 	static boolean[] composite;
-	/* prime1[k] retrieves the k'th prime equiv to 1%3 (0-based). i.e. prime1[0] = 7, prime[1] = 13, ... */
-	static int[] prime1;
-	/* prime1[k] retrieves the k'th prime equiv to 2%3 (0-based), not including 5. i.e. prime1[0] = 11, 
-	 * prime[1] = 17, ... */
-	static int[] prime2;
 	/* prime[k] retrieves the k'th prime (zero-based). i.e. prime[0] = 2, prime[1] = 3, ... */
 	static int[] prime;
+	
 	/* Precomputed number of pairs of primes that, when concatenated, are prime. */
 	static final int NUM_PAIRS = 47673;
-	/* Holds the pairs of primes in sorted order. */
+	/* Holds the concatenable pairs of primes in sorted order. */
 	static int[][] pairs;
-	/* numPairsWith[k] holds the number of pairs where k is the first in the pair. */
+	/* numPairsWith[k] holds the number of concatenable pairs where k is the first in the pair. */
 	static int[] numPairsWith;
 
-	/* Sieve primes up to 20000000, and fill in-order mappings of k to k'th prime equiv to 1%3 or 2%3 in 
-	 * prime1 and prime2, respectively. */
+	/* prime1[k] retrieves the k'th prime equiv to 1%3 (0-based). i.e. prime1[0] = 7, prime[1] = 13, ... */
+	static int[] prime1;
+	/* prime1[k] retrieves the k'th prime equiv to 2%3 (0-based), not including 2 or 5. i.e. prime1[0] = 11, 
+	 * prime[1] = 17, ... */
+	static int[] prime2;
+
+	/* Sieve primes up to 20000000, fill in-order mappings of k to k'th prime equiv to 1%3 or 2%3 in 
+	 * prime1[] and prime2[], respectively, and fill in-order mapping of k to k'th prime in prime[]. */
 	public static void sieve() {
 		composite = new boolean[20000001];
 		/* Sieve primes <= MAX_N. */
@@ -109,53 +108,8 @@ public class Euler060 {
 		}
 	}
 
-	/* Return n^pow % mod. */
-	public static long pow(long n, long pow, long mod) {
-		if (pow == 1) return n%mod;
-		long half = pow(n, pow/2, mod);
-		long ans = mult(half,half,mod);
-		if (pow%2 == 1) ans = mult(ans, n, mod);
-		return ans%mod;
-	}
-
-	/* Return a*b % mod. */
-	public static long mult(long a, long b, long mod) {
-		long x = (long) (((double)a*b)/mod);
-		long ans = (a*b-x*mod);
-		return ans<0? ans+mod : ans;
-	}
-
-	/* Miller-Rabin primality test. Note that for n < 3,215,031,751, it is enough and deterministic to test 
-	 * a = 2, 3, 5, and 7
-	 * ( https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test ) */
-	public static boolean isPrime(long n) {
-		if (n < composite.length) return !composite[(int) n];
-		if (n%3 == 0 || n%5 == 0) return false;
-		long d = n-1;
-		int s = 0;
-		while (d%2 == 0) {
-			s++;
-			d/=2;
-		}
-		for (int iter = 0; iter < 4; iter++) {
-			int a = prime[iter];
-			long x = pow(a,d,n);
-			if (x == 1 || x == n-1) continue;
-			boolean witness = false;
-			for (int i = 0; i < s-1; i++) {
-				x = mult(x,x,n);
-				if (x == n-1) {
-					witness = true;
-					break;
-				}
-			}
-			if (witness) continue;
-			return false;
-		}
-		return true;
-	}
-
-	/* Generate all concatenable prime pairs and store in sorted order using prime1 and prime2. */
+	/* Generate all concatenable prime pairs and store in sorted order using prime1 and prime2. Similar
+	 * to merging sorted lists. */
 	public static void fillPairs() {
 		pairs = new int[NUM_PAIRS][2];
 		int index = 0;
@@ -221,7 +175,7 @@ public class Euler060 {
 		}
 	}
 
-	/* Fill numPairsWith with how many times each prime appears as first in pairs. */
+	/* Fill numPairsWith with how many times each prime appears as first in concatenable pairs. */
 	public static void fillNumPairsWith() {
 		numPairsWith = new int[MAX_N+1];
 		for (int i = 0; i < pairs.length-1; i++) {
@@ -234,13 +188,59 @@ public class Euler060 {
 		}
 	}
 
-	/* Return concatenation of n1 and n2. */
-	public static long concat(int n1, int n2) {
-		return (long) tenToThe[(int) Math.log10(n2)+1]*n1 + n2;
-		//return Long.parseLong(Integer.toString(n1) + Integer.toString(n2));
+	/* Return n^pow % mod. */
+	public static long pow(long n, long pow, long mod) {
+		if (pow == 1) return n%mod;
+		long half = pow(n, pow/2, mod);
+		long ans = mult(half,half,mod);
+		if (pow%2 == 1) ans = mult(ans, n, mod);
+		return ans%mod;
 	}
 
-	/* Search for key k in pairs[][]. Since pairs is sorted, return first index at which k occurs or -1. */
+	/* Return a*b % mod. */
+	public static long mult(long a, long b, long mod) {
+		long x = (long) (((double)a*b)/mod);
+		long ans = (a*b-x*mod);
+		return ans<0? ans+mod : ans;
+	}
+
+	/* Miller-Rabin primality test. Note that for n < 4,759,123,141, it is enough and deterministic to test 
+	 * a = 2, 7, and 61
+	 * ( https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test ) */
+	static final int[] witnessesToCheck = new int[] {2,7,61};
+	public static boolean isPrime(long n) {
+		if (n < composite.length) return !composite[(int) n];
+		if (n%3 == 0 || n%5 == 0) return false;
+		long d = n-1;
+		int s = 0;
+		while (d%2 == 0) {
+			s++;
+			d/=2;
+		}
+		for (int iter = 0; iter < witnessesToCheck.length; iter++) {
+			int a = witnessesToCheck[iter];
+			long x = pow(a,d,n);
+			if (x == 1 || x == n-1) continue;
+			boolean witness = false;
+			for (int i = 0; i < s-1; i++) {
+				x = mult(x,x,n);
+				if (x == n-1) {
+					witness = true;
+					break;
+				}
+			}
+			if (witness) continue;
+			return false;
+		}
+		return true;
+	}
+
+	/* Return concatenation of n1 and n2. */
+	public static long concat(int n1, int n2) {
+		return (long) tenToThe[(int)Math.floor(Math.log10(n2)+1)]*n1 + n2;
+	}
+
+	/* Search for key k in pairs[][]. Binary search, return first index at which k occurs or -1. */
 	public static int searchFirst(int k, int l, int r) {
 		if (l > r) return -1;
 		int m = (l+r)/2;
@@ -267,29 +267,12 @@ public class Euler060 {
 		return true;
 	}
 
-	/* Given the index of the first prime, add sums of all concatenable triples starting with first prime
+	/* Given the index of the first prime, add sums of all concatenable K-tuples starting with first prime
 	 * to ans. */
-	public static void findTriples(int firstPrime, int N, List<Integer> ans) {
+	public static void findTuples(int firstPrime, int N, int K, List<Integer> ans) {
 		int first = prime[firstPrime];
 		int numTotal = numPairsWith[first];
-		if (numTotal < 3 || first >= N) return;
-		int index = searchFirst(first, 0, pairs.length);
-		/* For each pair with first = pair[0] */
-		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
-			int second = pairs[i][1];
-			for (int j = i+1; j < index+numTotal && pairs[j][1] < N; j++) {
-				int third = pairs[j][1];
-				if (searchPair(second,third)) ans.add(first + second + third);
-			}
-		}
-	}
-
-	/* Given the index of the first prime, add sums of all concatenable quadruples starting with first prime
-	 * to ans. */
-	public static void findQuadruples(int firstPrime, int N, List<Integer> ans) {
-		int first = prime[firstPrime];
-		int numTotal = numPairsWith[first];
-		if (numTotal < 3 || first >= N) return;
+		if (numTotal < K-1 || first >= N) return;
 		int index = searchFirst(first, 0, pairs.length);
 		/* For each pair with first = pair[0] */
 		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
@@ -297,33 +280,17 @@ public class Euler060 {
 			for (int j = i+1; j < index+numTotal && pairs[j][1] < N; j++) {
 				int third = pairs[j][1];
 				if (searchPair(second,third)) {
-					for (int z = j+1; z < index+numTotal && pairs[z][1] < N; z++) {
-						int fourth = pairs[z][1];
-						if (searchPair(second,fourth) && searchPair(third,fourth)) {
-							ans.add(first+second+third+fourth);
-						}
+					if (K==3) {
+						ans.add(first+second+third);
+						continue;
 					}
-				}
-			}
-		}
-	}
-
-	/* Given the index of the first prime, add sums of all concatenable quintuples starting with first prime
-	 * to ans. */
-	public static void findQuintuples(int firstPrime, int N, List<Integer> ans) {
-		int first = prime[firstPrime];
-		int numTotal = numPairsWith[first];
-		if (numTotal < 3 || first >= N) return;
-		int index = searchFirst(first, 0, pairs.length);
-		/* For each pair with first = pair[0] */
-		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
-			int second = pairs[i][1];
-			for (int j = i+1; j < index+numTotal && pairs[j][1] < N; j++) {
-				int third = pairs[j][1];
-				if (searchPair(second,third)) {
 					for (int z = j+1; z < index+numTotal && pairs[z][1] < N; z++) {
 						int fourth = pairs[z][1];
 						if (searchPair(second,fourth) && searchPair(third,fourth)) {
+							if (K==4) {
+								ans.add(first+second+third+fourth);
+								continue;
+							}
 							for (int y = z+1; y < index+numTotal && pairs[y][1] < N; y++) {
 								int fifth = pairs[y][1];
 								if (searchPair(second,fifth) && searchPair(third,fifth) && searchPair(fourth,fifth)) {
@@ -339,23 +306,9 @@ public class Euler060 {
 
 	public static List<Integer> solution(int N, int K) {
 		List<Integer> ans = new ArrayList<Integer>();
-		if (K == 3) {
-			findTriples(1,N,ans);
-			for (int i = 3; i < prime.length && prime[i] < N; i++) {
-				findTriples(i,N,ans);
-			}
-		}
-		else if (K == 4) {
-			findQuadruples(1,N,ans);
-			for (int i = 3; i < prime.length && prime[i] < N; i++) {
-				findQuadruples(i,N,ans);
-			}
-		}
-		else if (K == 5) {
-			findQuintuples(1,N,ans);
-			for (int i = 3; i < prime.length && prime[i] < N; i++) {
-				findQuintuples(i,N,ans);
-			}
+		findTuples(1,N,K,ans);
+		for (int i = 3; i < prime.length && prime[i] < N; i++) {
+			findTuples(i,N,K,ans);
 		}
 		return ans;
 	}

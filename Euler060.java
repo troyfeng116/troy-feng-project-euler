@@ -34,12 +34,20 @@ public class Euler060 {
 	 * bode well for searching for K = 3, 4, or 5 using the method described above.  
 	 *
 	 * We are definitely wasting a lot of time in checking certain pairs more than once; would memoizing
-	 * pairs work (since there are 47673 pairs)? Because then we could loop through the 47673 pairs and
-	 * binary search for the next prime.
-	 *
+	 * pairs work (since there are 47673 pairs)?
+	 * 
 	 * A nice observation: All pairs are equivalent mod 3 with the exception of those including 3 itself.
 	 * i.e. p1 and p2 can only be a concatenable pair if p1 and p2 are equivalent mod 3. This is because
-	 * a number is equivalent to the sum of its digits mod 3.  */
+	 * a number is equivalent to the sum of its digits mod 3. So all K-tuples must be in one group,
+	 * excluding 3. Finally, once we have all possible pairs sorted, we can test all sets of K-tuples
+	 * with the same first prime, and then test if all of the second primes are pairs.
+	 *
+	 * Say we're looking for K-tuples whose least prime is 3. We look at all sets of K pairs whose first
+	 * prime is 3, say (3,p1), (3,p2), and (3,p3). Then (p1,p2), (p1,p3), and (p2,p3) must all also be
+	 * valid prime pairs. We can binary search for those. 
+	 *
+	 * Finally, I think I'm going to write separate functions for K=3, 4, and 5. Recursion would take
+	 * too long if K isn't fixed. */
 
 	static final int MAX_N = 20000;
 	static final int[] tenToThe = new int[] {1,10,100,1000,10000,100000};
@@ -233,40 +241,139 @@ public class Euler060 {
 	}
 
 	/* Search for key k in pairs[][]. Since pairs is sorted, return first index at which k occurs or -1. */
-	public static int search(int k, int l, int r) {
+	public static int searchFirst(int k, int l, int r) {
 		if (l > r) return -1;
 		int m = (l+r)/2;
-		if (k < pairs[m][0]) return search(k,l,m-1);
-		if (k > pairs[m][0]) return search(k,m+1,r);
-		while (m > 0 && pairs[m][0] == k) m--;
+		if (k < pairs[m][0]) return searchFirst(k,l,m-1);
+		if (k > pairs[m][0]) return searchFirst(k,m+1,r);
+		while (m > 0 && pairs[m-1][0] == k) m--;
 		return m;
 	}
 
-	/* Given the sum of primes in set so far, the next prime to search, and the target number K, return sum
-	 * of all solutions including next prime. */
-	public static void getSums(int soFar, int nextPrime, int K, List<Integer> ans) {
+	/* Search for pair of primes (p1,p2) in pairs, using binary search to find first occurrence of p1 and
+	 * then searching for p2 using binary search. */
+	public static boolean searchPair(int p1, int p2) {
+		int m = searchFirst(p1, 0, pairs.length-1);
+		if (m < 0) return false;
+		return searchPairAux(p2,m,m+numPairsWith[p1]-1);
+	}
 
+	/* Binary search for p2 in the second pair. Given that for all i:[l,r], pairs[i][0] = p1 from searchPair. */
+	public static boolean searchPairAux(int p2, int l, int r) {
+		if (l > r) return false;
+		int m = (l+r)/2;
+		if (p2 < pairs[m][1]) return searchPairAux(p2, l, m-1);
+		if (p2 > pairs[m][1]) return searchPairAux(p2, m+1, r);
+		return true;
+	}
+
+	/* Given the index of the first prime, add sums of all concatenable triples starting with first prime
+	 * to ans. */
+	public static void findTriples(int firstPrime, int N, List<Integer> ans) {
+		int first = prime[firstPrime];
+		int numTotal = numPairsWith[first];
+		if (numTotal < 3 || first >= N) return;
+		int index = searchFirst(first, 0, pairs.length);
+		/* For each pair with first = pair[0] */
+		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
+			int second = pairs[i][1];
+			for (int j = i+1; j < index+numTotal && pairs[j][1] < N; j++) {
+				int third = pairs[j][1];
+				if (searchPair(second,third)) ans.add(first + second + third);
+			}
+		}
+	}
+
+	/* Given the index of the first prime, add sums of all concatenable quadruples starting with first prime
+	 * to ans. */
+	public static void findQuadruples(int firstPrime, int N, List<Integer> ans) {
+		int first = prime[firstPrime];
+		int numTotal = numPairsWith[first];
+		if (numTotal < 3 || first >= N) return;
+		int index = searchFirst(first, 0, pairs.length);
+		/* For each pair with first = pair[0] */
+		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
+			int second = pairs[i][1];
+			for (int j = i+1; j < index+numTotal && pairs[j][1] < N; j++) {
+				int third = pairs[j][1];
+				if (searchPair(second,third)) {
+					for (int z = j+1; z < index+numTotal && pairs[z][1] < N; z++) {
+						int fourth = pairs[z][1];
+						if (searchPair(second,fourth) && searchPair(third,fourth)) {
+							ans.add(first+second+third+fourth);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/* Given the index of the first prime, add sums of all concatenable quintuples starting with first prime
+	 * to ans. */
+	public static void findQuintuples(int firstPrime, int N, List<Integer> ans) {
+		int first = prime[firstPrime];
+		int numTotal = numPairsWith[first];
+		if (numTotal < 3 || first >= N) return;
+		int index = searchFirst(first, 0, pairs.length);
+		/* For each pair with first = pair[0] */
+		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
+			int second = pairs[i][1];
+			for (int j = i+1; j < index+numTotal && pairs[j][1] < N; j++) {
+				int third = pairs[j][1];
+				if (searchPair(second,third)) {
+					for (int z = j+1; z < index+numTotal && pairs[z][1] < N; z++) {
+						int fourth = pairs[z][1];
+						if (searchPair(second,fourth) && searchPair(third,fourth)) {
+							for (int y = z+1; y < index+numTotal && pairs[y][1] < N; y++) {
+								int fifth = pairs[y][1];
+								if (searchPair(second,fifth) && searchPair(third,fifth) && searchPair(fourth,fifth)) {
+									ans.add(first+second+third+fourth+fifth);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static List<Integer> solution(int N, int K) {
 		List<Integer> ans = new ArrayList<Integer>();
+		if (K == 3) {
+			findTriples(1,N,ans);
+			for (int i = 3; i < prime.length && prime[i] < N; i++) {
+				findTriples(i,N,ans);
+			}
+		}
+		else if (K == 4) {
+			findQuadruples(1,N,ans);
+			for (int i = 3; i < prime.length && prime[i] < N; i++) {
+				findQuadruples(i,N,ans);
+			}
+		}
+		else if (K == 5) {
+			findQuintuples(1,N,ans);
+			for (int i = 3; i < prime.length && prime[i] < N; i++) {
+				findQuintuples(i,N,ans);
+			}
+		}
 		return ans;
 	}
 	
 	public static void main(String[] args) {
-		long time = System.currentTimeMillis();
+		//long time = System.currentTimeMillis();
 		sieve();
-		long time1 = System.currentTimeMillis();
+		//long time1 = System.currentTimeMillis();
 		fillPairs();
-		long time2 = System.currentTimeMillis();
+		//long time2 = System.currentTimeMillis();
 		fillNumPairsWith();
-		for (int i = 0; i < pairs.length; i++) {
+		/*for (int i = 0; i < pairs.length; i++) {
 			System.out.println(pairs[i][0] + " " + pairs[i][1]);
-		}
-		System.out.println("TIME SIEVE: " + (time1 - time) + " TIME PAIRS: " + (time2 - time1));
-		System.out.println(numPairsWith[4157]);
+		}*/
+		//System.out.println("TIME SIEVE: " + (time1 - time) + " TIME PAIRS: " + (time2 - time1));
+		//System.out.println(searchPair(3,109));
 
-		System.exit(0);
+		//System.exit(0);
 
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");
@@ -275,7 +382,7 @@ public class Euler060 {
 		List<Integer> res = solution(N,K);
 		Collections.sort(res);
 		for (int i = 0; i < res.size(); i++) System.out.println(res.get(i));
-		System.out.println(res.size());
+		//System.out.println(res.size());
 		s.close();
 	}
 }

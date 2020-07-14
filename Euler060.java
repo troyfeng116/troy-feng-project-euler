@@ -1,4 +1,4 @@
-/* -------- UNSOLVED 92.86/100 -------- */
+/* -------- SOLVED -------- */
 
 /* The primes 3, 7, 109, and 673, are quite remarkable. By taking any two primes and concatenating them 
  * in any order the result will always be prime. For example, taking 7 and 109, both 7109 and 1097 are prime.
@@ -13,38 +13,28 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Arrays;
 
 public class Euler060 {
 	
-	/* Thoughts/approach: It seems we're gonna need Miller-Rabin again, as we'll be evaluating primality of
-	 * 10-digit primes. There are 2262 primes less than 20000. So running 5 nested loops for all combinations
-	 * of 5 primes is probably not gonna work. However, if we find TWO primes that work, we could then try
-	 * to extend those two primes to sets of three primes. Once we find three primes, we could try all sets
-	 * of four primes with those three primes. Once we find four, we then extend to five. We would have to
-	 * keep a list of primes that work so far. When trying to extend a set S of k primes, consider the k+1'th
-	 * prime p. For all S[i], p concat S[i] and S[i] concat p must be prime for us to be able to extend S to
-	 * include p. After searching, we backtrack.
+	/* Thoughts/approach: For concatenation of two integers, string concatenation would work but perhaps
+	 * counting digits and adding n1*10^numDigits to n2 might be better? 
 	 *
-	 * As for concatenation of two integers, string concatenation would work but perhaps counting digits and
-	 * adding n1*10^numDigits to n2 might be better? 
-	 *
-	 * EDIT: After playing around, I found that there are 47673 PAIRS of primes less than 20000 that, when
+	 * After playing around, I found that there are 47673 PAIRS of primes less than 20000 that, when
 	 * concatenated with each other, form another prime by inputting N=20000 and K=2 (!). This does not 
-	 * bode well for searching for K = 3, 4, or 5 using the method described above.  
-	 *
-	 * We are definitely wasting a lot of time in checking certain pairs more than once; would memoizing
-	 * pairs work (since there are 47673 pairs)?
+	 * bode well for searching for K = 3, 4, or 5 using the method described above. I think precalculating
+	 * and memoizing pairs might work.
 	 * 
 	 * A nice observation: All pairs are equivalent mod 3 with the exception of those including 3 itself.
 	 * i.e. p1 and p2 can only be a concatenable pair if p1 and p2 are equivalent mod 3. This is because
 	 * a number is equivalent to the sum of its digits mod 3. So all K-tuples must be in one group,
 	 * excluding 3. Finally, once we have all possible pairs sorted, we can test all sets of K-tuples
-	 * with the same first prime, and then test if all of the second primes are pairs.
+	 * with the same first prime, and then test if all of the second primes are pairs. This will help
+	 * speed up generating pairs, as we reduce primality testing by about 50%.
 	 *
-	 * Say we're looking for K-tuples whose least prime is 3. We look at all sets of K pairs whose first
-	 * prime is 3, say (3,p1), (3,p2), and (3,p3). Then (p1,p2), (p1,p3), and (p2,p3) must all also be
-	 * valid prime pairs. We can binary search for those. */
+	 * Once we have all concatenable pairs sorted, say we're looking for K-tuples whose least prime is 3. 
+	 * We look at all sets of K-1 pairs whose first prime is 3, say (3,p1), (3,p2), and (3,p3) for K=4. 
+	 * Then (p1,p2), (p1,p3), and (p2,p3) must all also be valid prime pairs. We can binary search for 
+	 * those. */
 
 	static final int MAX_N = 20000;
 	static final int[] tenToThe = new int[] {1,10,100,1000,10000,100000};
@@ -52,7 +42,7 @@ public class Euler060 {
 	/* prime[k] retrieves the k'th prime (zero-based). i.e. prime[0] = 2, prime[1] = 3, ... */
 	static int[] prime;
 	
-	/* Precomputed number of pairs of primes that, when concatenated, are prime. */
+	/* Precomputed number of pairs of concatenable primes. */
 	static final int NUM_PAIRS = 47673;
 	/* Holds the concatenable pairs of primes in sorted order. */
 	static int[][] pairs;
@@ -186,6 +176,8 @@ public class Euler060 {
 			}
 			numPairsWith[pairs[i][0]] = count;
 		}
+		/* Increment count for last pair's first prime. */
+		numPairsWith[pairs[pairs.length-1][0]]++;
 	}
 
 	/* Return n^pow % mod. */
@@ -272,8 +264,8 @@ public class Euler060 {
 	public static void findTuples(int firstPrime, int N, int K, List<Integer> ans) {
 		int first = prime[firstPrime];
 		int numTotal = numPairsWith[first];
-		if (numTotal < K-1 || first >= N) return;
-		int index = searchFirst(first, 0, pairs.length);
+		if (numTotal < K-1) return;
+		int index = searchFirst(first, 0, pairs.length-1);
 		/* For each pair with first = pair[0] */
 		for (int i = index; i < index+numTotal && pairs[i][1] < N; i++) {
 			int second = pairs[i][1];
@@ -304,6 +296,7 @@ public class Euler060 {
 		}
 	}
 
+	/* For each starting prime (3,7,11,13,...), find all K-tuples with that starting prime and add to ans. */
 	public static List<Integer> solution(int N, int K) {
 		List<Integer> ans = new ArrayList<Integer>();
 		findTuples(1,N,K,ans);
@@ -314,19 +307,9 @@ public class Euler060 {
 	}
 	
 	public static void main(String[] args) {
-		//long time = System.currentTimeMillis();
 		sieve();
-		//long time1 = System.currentTimeMillis();
 		fillPairs();
-		//long time2 = System.currentTimeMillis();
 		fillNumPairsWith();
-		/*for (int i = 0; i < pairs.length; i++) {
-			System.out.println(pairs[i][0] + " " + pairs[i][1]);
-		}*/
-		//System.out.println("TIME SIEVE: " + (time1 - time) + " TIME PAIRS: " + (time2 - time1));
-		//System.out.println(searchPair(3,109));
-
-		//System.exit(0);
 
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");
@@ -335,7 +318,6 @@ public class Euler060 {
 		List<Integer> res = solution(N,K);
 		Collections.sort(res);
 		for (int i = 0; i < res.size(); i++) System.out.println(res.get(i));
-		//System.out.println(res.size());
 		s.close();
 	}
 }

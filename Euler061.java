@@ -102,11 +102,33 @@ public class Euler061 {
 		return false;
 	}
 
-	/*  */
-	public static void findSet(int[] N, int cur, int[] usedSoFar, int sumSoFar, Set<Integer> ans) {
+	/* Return next lexicographic permutation of p[]. */
+	public static boolean nextPermutation(int[] p) {
+		int n = p.length;
+		int k = n-2;
+		while (k >= 0 && p[k] > p[k+1]) k--;
+		if (k < 0) return false;
+		int l = n-1;
+		while (p[l] < p[k]) l--;
+		int temp = p[l];
+		p[l] = p[k];
+		p[k] = temp;
+		for (int i = k+1; i <= (n+k)/2; i++) {
+			temp = p[n-i+k];
+			p[n-i+k] = p[i];
+			p[i] = temp;
+		}
+		return true;
+	}
+
+	/* Recursive function finding sets of cyclic N-gonal numbers corresponding to given set of N. */
+	public static void findCyclic(int[] N, int cur, int[] usedSoFar, int sumSoFar, Set<Integer> ans) {
 		if (cur==N.length) {
 			for (int i: usedSoFar) System.out.print(i + " ");
 			System.out.println();
+			/* Check that last and first elements are cyclic. */
+			if (usedSoFar[cur-1]%100 != usedSoFar[0]/100) return;
+			System.out.println("FOUND");
 			ans.add(sumSoFar);
 			return;
 		}
@@ -119,7 +141,7 @@ public class Euler061 {
 				int next = tri.get(key);
 				if (!alreadyUsed(usedSoFar,next)) {
 					usedSoFar[cur] = next;
-					findSet(N,cur+1,usedSoFar,sumSoFar+next,ans);
+					findCyclic(N,cur+1,usedSoFar,sumSoFar+next,ans);
 				}
 			}
 			return;
@@ -129,7 +151,7 @@ public class Euler061 {
 				int next = square.get(key);
 				if (!alreadyUsed(usedSoFar,next)) {
 					usedSoFar[cur] = next;
-					findSet(N,cur+1,usedSoFar,sumSoFar+next,ans);
+					findCyclic(N,cur+1,usedSoFar,sumSoFar+next,ans);
 				}
 			}
 			return;
@@ -139,7 +161,7 @@ public class Euler061 {
 				int next = pent.get(key);
 				if (!alreadyUsed(usedSoFar,next)) {
 					usedSoFar[cur] = next;
-					findSet(N,cur+1,usedSoFar,sumSoFar+next,ans);
+					findCyclic(N,cur+1,usedSoFar,sumSoFar+next,ans);
 				}
 			}
 			return;
@@ -149,7 +171,7 @@ public class Euler061 {
 				int next = hex.get(key);
 				if (!alreadyUsed(usedSoFar,next)) {
 					usedSoFar[cur] = next;
-					findSet(N,cur+1,usedSoFar,sumSoFar+next,ans);
+					findCyclic(N,cur+1,usedSoFar,sumSoFar+next,ans);
 				}
 			}
 			return;
@@ -159,7 +181,7 @@ public class Euler061 {
 				int next = hep.get(key);
 				if (!alreadyUsed(usedSoFar,next)) {
 					usedSoFar[cur] = next;
-					findSet(N,cur+1,usedSoFar,sumSoFar+next,ans);
+					findCyclic(N,cur+1,usedSoFar,sumSoFar+next,ans);
 				}
 			}
 			return;
@@ -169,78 +191,76 @@ public class Euler061 {
 				int next = oct.get(key);
 				if (!alreadyUsed(usedSoFar,next)) {
 					usedSoFar[cur] = next;
-					findSet(N,cur+1,usedSoFar,sumSoFar+next,ans);
+					findCyclic(N,cur+1,usedSoFar,sumSoFar+next,ans);
 				}
 			}
 			return;
 		}
 	}
 
-	/*for (int n = 45; n <= 140; n++) {
-			int x = n*(n+1)/2;
-			tri.put(x/100, x);
-		}
-		for (int n = 32; n <= 99; n++) {
-			int x = n*n;
-			square.put(x/100, x);
-		}
-		for (int n = 26; n <= 81; n++) {
-			int x = n*(3*n-1)/2;
-			pent.put(x/100, x);
-		}
-		for (int n = 23; n <= 70; n++) {
-			int x = n*(2*n-1);
-			hex.put(x/100, x);
-		}
-		for (int n = 21; n <= 63; n++) {
-			int x = n*(5*n-3)/2;
-			hep.put(x/100, x);
-		}
-		for (int n = 19; n <= 58; n++) {
-			int x = n*(3*n-2);
-			oct.put(x/100, x);
-		} */
-	public static Set<Integer> solution(int[] N) {
-		Set<Integer> ans = new HashSet<Integer>();
+	public static void getPermSolution(int[] N, Set<Integer> ans) {
 		int n = N[0];
 		int[] usedSoFar = new int[N.length];
 		if (n==3) {
 			for (int i = 45; i <= 140; i++) {
 				usedSoFar[0] = i*(i+1)/2;
-				findSet(N,1,usedSoFar,usedSoFar[0],ans);
+				findCyclic(N,1,usedSoFar,usedSoFar[0],ans);
 			}
 		}
 		else if (n==4) {
 			for (int i = 32; i <= 99; i++) {
 				usedSoFar[0] = i*i;
-				findSet(N,1,usedSoFar,usedSoFar[0],ans);
+				findCyclic(N,1,usedSoFar,usedSoFar[0],ans);
 			}
 		}
 		else if (n==5) {
 			for (int i = 26; i <= 81; i++) {
 				usedSoFar[0] = i*(3*i-1)/2;
-				findSet(N,1,usedSoFar,usedSoFar[0],ans);
+				findCyclic(N,1,usedSoFar,usedSoFar[0],ans);
 			}
 		}
 		else if (n==6) {
 			for (int i = 23; i <= 70; i++) {
 				usedSoFar[0] = i*(2*i-1);
-				findSet(N,1,usedSoFar,usedSoFar[0],ans);
+				findCyclic(N,1,usedSoFar,usedSoFar[0],ans);
 			}
 		}
 		else if (n==7) {
 			for (int i = 21; i <= 63; i++) {
 				usedSoFar[0] = i*(5*i-3)/2;
-				findSet(N,1,usedSoFar,usedSoFar[0],ans);
+				findCyclic(N,1,usedSoFar,usedSoFar[0],ans);
 			}
 		}
 		else if (n==6) {
 			for (int i = 19; i <= 58; i++) {
 				usedSoFar[0] = i*(3*i-2);
-				findSet(N,1,usedSoFar,usedSoFar[0],ans);
+				findCyclic(N,1,usedSoFar,usedSoFar[0],ans);
 			}
 		}
+	}
+
+	public static Set<Integer> solution(int[] N) {
+		Set<Integer> ans = new HashSet<Integer>();
+		getPermSolution(N, ans);
+		while (nextPermutation(N)) {
+			for (int i: N) System.out.print(i + " ");
+			System.out.println();
+			getPermSolution(N, ans);
+		}
 		return ans;
+	}
+
+	/* Insert x into n, a la insertion sort. */
+	public static void insert(int x, int[] n) {
+		int k = 0;
+		while (k < n.length && x >= n[k] && n[k] != 0) k++;
+		int temp = n[k];
+		n[k] = x;
+		for (int i = k+1; i < n.length-1 && temp != 0; i++) {
+			n[i+1] = n[i];
+			n[i] = temp;
+			temp = n[i+1];
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -249,7 +269,13 @@ public class Euler061 {
 		int T = Integer.parseInt(s.nextLine());
 		String[] NInputs = s.nextLine().split(" ");
 		int[] N = new int[T];
-		for (int i = 0; i < T; i++) N[i] = Integer.parseInt(NInputs[i]);
+		for (int i = 0; i < T; i++) {
+			int next = Integer.parseInt(NInputs[i]);
+			insert(next, N);
+		}
+		for (int i: N) System.out.print(i + " ");
+		System.out.println();
+
 		List<Integer> ans = new ArrayList<Integer>(solution(N));
 		Collections.sort(ans);
 		ans.forEach((n)->System.out.println(n));

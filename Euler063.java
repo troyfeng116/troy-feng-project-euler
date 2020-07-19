@@ -12,14 +12,13 @@ import java.util.Scanner;
 
 public class Euler063 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: simple loop over N-th powers within N-digit range should do. Even better, we won't
+	 * have issues with long overflow, since Long.MAX_VALUE is quite close to 10^19 and 9^19 << 10^19. */
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
-		int t = Integer.parseInt(s.nextLine());
-		for (int t0 = 0; t0 < t; t0++) {
-			
-		}
+		int n = Integer.parseInt(s.nextLine());
+		
 		s.close();
 	}
 }

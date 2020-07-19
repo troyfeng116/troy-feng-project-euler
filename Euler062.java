@@ -1,8 +1,8 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* The cube, 41063625=345^3, can be permuted to produce two other cubes: 56623104=384^3 and 66430125=405^3.
  * 
- * In fact, 41063625 is the smallest cube such that exactly three permutations of its digits are also cubes
+ * In fact, 41063625 is the smallest cube such that exactly three permutations of its digits are also cubes.
  *
  * You are given N, find the smallest cube for which exactly K permutations of its digits are the cube of 
  * some number which is < N. If there are multiple sets, print the minimal element of each in sorted order.
@@ -12,6 +12,9 @@
 import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Euler062 {
 	
@@ -27,8 +30,14 @@ public class Euler062 {
 	 * across families but equal within families. Then, value will contain a pair: first will hold the 
 	 * count of cubes with that key, and second will hold the min cube in that family. We loop from i:[1,N), 
 	 * finding the keys for each i^3 and incrementing in HashMap. Then, we loop over valueSet and return 
-	 * min second such that first = K. */
+	 * min second such that first = K.
+	 *
+	 * EDIT: problem phrased poorly. The line that "if there are multiple sets, print minimal element"
+	 * confused me at first as I thought there should be only one answer. But we should be printing ALL
+	 * x^3 such that 1) x^3 is smallest cube in family and 2) family contains exactly K cubes. */
 
+	/* Implemented struct Pair to hold first = count of cubes in family, second = smallest cube in family.
+	 * To be used as values in HashMap. */
 	static class Pair {
 		int first;
 		long second;
@@ -61,9 +70,11 @@ public class Euler062 {
 		return ans;
 	}
 
-	/* Given N,K, return min i such that i^3 is in a family with exactly K cubes less than N^3. */
-	public static long solution(long N, int K) {
+	/* Given N,K, return sorted list of all x such that x is the least cube in a family with exactly K cubes 
+	 * less than N^3. */
+	public static List<Long> solution(long N, int K) {
 		Map<Long,Pair> table = new HashMap<Long,Pair>();
+		/* For each cube i^3 < N^3, increment count of cubes in its family. */
 		for (int i = 1; i < N; i++) {
 			long i2 = (long) i;
 			long cube = i2*i2*i2;
@@ -72,11 +83,12 @@ public class Euler062 {
 			Pair newEntry = new Pair(oldEntry.first+1, oldEntry.second);
 			table.put(key, newEntry);
 		}
-		long x = Long.MAX_VALUE;
+		List<Long> ans = new ArrayList<Long>();
 		for (Pair p: table.values()) {
-			if (p.first == K) x = Math.min(x, p.second);
+			if (p.first == K) ans.add(p.second);
 		}
-		return x;
+		Collections.sort(ans);
+		return ans;
 	}
 	
 	public static void main(String[] args) {
@@ -85,7 +97,8 @@ public class Euler062 {
 		String[] inputs = s.nextLine().split(" ");
 		long N = Integer.parseInt(inputs[0]);
 		int K = Integer.parseInt(inputs[1]);
-		System.out.println(solution(N,K));
+		List<Long> ans = solution(N,K);
+		for (long i: ans) System.out.println(i);
 		s.close();
 	}
 }

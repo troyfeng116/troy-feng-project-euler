@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* All square roots are periodic when written as continued fractions and can be written in the form:
  *
@@ -42,8 +42,7 @@
  * INPUTS: 10 <= N <= 30000 */
 
 import java.util.Scanner;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.Arrays;
 
 public class Euler064 {
 	
@@ -59,56 +58,50 @@ public class Euler064 {
 	 *
 	 * Note that all cycles start right after the first a0 approximation. */
 
-	static class Triple {
-		int first;
-		int second;
-		int third;
-		public Triple(int f, int s, int t) {
-			first = f;
-			second = s;
-			third = t;
-		}
-		public boolean equals(Triple t) {
-			return first == t.first && second == t.second && third == t.third;
-		}
-	}
-
 	/* Continue fraction x/(sqrt(n) - y) to the form a + (sqrt(n)-b)/c, where b is largest integer <= a0.
-	 * Return triple(a,b,c). */
-	public static Triple rationalize(int x, int y, int n, int a0) {
+	 * Return int[] {a,b,c}. */
+	public static int[] rationalize(int x, int y, int n, int a0) {
 		int a = 0;
-		int b = x*y;
-		int c = n - y*y;
-
-		a = (b+a0)%c + 1;
+		int b = y;
+		int c = (n-y*y)/x;
+		/* Now we have expression of form 0 + (sqrt(n) + b)/c. Subtract b from p until -a0 <= b < 0, and
+		 * increment a while doing so (essentially subtracting c/c big 1). */
+		int diff = b+a0;
+		a = diff/c;
 		b -= a*c;
 		b *= -1;
-		return new Triple(a,b,c);
+		return new int[] {a,b,c};
 	}
 
-	/* At the start of the first iteration, we have a0 + (sqrt(n) - a0). So we have to rationalize
-	 * 1/(sqrt(n) - a0) first. */
+	/* Return cycle of sqrt(n). a0 is initial approximation. */
 	public static int findCycle(int n, int a0) {
-		Set<Triple> set = new HashSet<Triple>();
-		Triple t = rationalize(1, a0, n, a0);
-		int count = 1;
-		while (!set.contains(t)) {
-			set.add(t);
-			t = rationalize(t.second, t.third, n, a0);
+		/* At the start of the first iteration, we have a0 + (sqrt(n) - a0). So we have to continue
+	 	 * 1/(sqrt(n) - a0) first. */
+		int[] prev = rationalize(1, a0, n, a0);
+		int m1 = prev[1];
+		int m2 = prev[2];
+		int count = 0;
+		while (true) {
 			count++;
+			/* If (a,b,c) correspond to a + (sqrt(n)-b)/c from previous iteration, we now want to
+			 * continue c/(sqrt(n) - b). */
+			int[] next = rationalize(prev[2], prev[1], n, a0);
+			/* If we reach the point where b and c repeat, cycle must reset. */
+			if (next[1] == m1 && next[2] == m2) break;
+			prev = Arrays.copyOf(next,3);
 		}
-		return count-1;
+		return count;
 	}
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int N = Integer.parseInt(s.nextLine());
-		int count = 0;
+		int ans = 0;
 		for (int n = 2; n <= N; n++) {
 			int a0 = (int) Math.sqrt(n);
-			if (a0*a0 != n && findCycle(n,a0)%2 == 1) count++;
+			if (a0*a0 != n && findCycle(n,a0)%2 == 1) ans++;
 		}
-		System.out.println(count);
+		System.out.println(ans);
 		s.close();
 	}
 }

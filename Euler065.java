@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* The square root of 2 can be written as an infinite continued fraction.
  *
@@ -34,6 +34,7 @@
  * INPUTS: 1 <= N <= 30000 */
 
 import java.util.Scanner;
+import java.math.BigInteger;
 
 public class Euler065 {
 	
@@ -46,20 +47,33 @@ public class Euler065 {
 	 *
 	 * For e, we're given a0 = 2, a1 = 1, a2 = 2, a3 = 1. Then, if k%3=0 or k%3=1, a_k = 1, else a_k = 2*(k/3+1). 
 	 * Finally, we're gonna need BigInteger. */
+
+	/* Given N, return sum of digits in numerator of N'th convergent of e. */
+	public static int solution(int N) {
+		/* Edge case: first two numerators are 2 and 3. */
+		if (N <= 2) return N+1;
+		BigInteger n2 = new BigInteger("2"); /* Numerator 2 terms ago. Initialized to a0 = 2 for e. */
+		BigInteger n1 = new BigInteger("3"); /* Numerator 1 term ago. Initialized to a1*a0+1 = 3 for e. */
+		BigInteger numerator = new BigInteger("3"); /* Current numerator term. */
+		/* Generate k'th (zero-based) numerator using recursive relation. */
+		for (int k = 2; k < N; k++) {
+			BigInteger n = k%3==2 ? new BigInteger(Integer.toString(2*(k/3+1))) : BigInteger.ONE;
+			numerator = n.multiply(n1).add(n2);
+			n2 = n1;
+			n1 = numerator;
+		}
+		String res = numerator.toString();
+		int ans = 0;
+		for (int i = 0; i < res.length(); i++) {
+			ans += res.charAt(i)-48;
+		}
+		return ans;
+	}
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int N = Integer.parseInt(s.nextLine());
-		int n2 = 2; /* Numerator 2 terms ago. Initialized to a0 = 2 for e convergent. */
-		int n1 = 3; /* Numerator 1 term ago. Initialized to a1*a0+1 = 3 for e convergent. */
-		int numerator = 3; /* Current numerator term. */
-		for (int k = 2; k < N; k++) {
-			int n = k%3==2 ? 2*(k/3+1) : 1;
-			numerator = n*n1 + n2;
-			n2 = n1;
-			n1 = numerator;
-		}
-		System.out.println(numerator);
+		System.out.println(solution(N));
 		s.close();
 	}
 }

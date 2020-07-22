@@ -25,14 +25,35 @@ import java.util.Scanner;
 
 public class Euler066 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: we can implement a quick brute force solution that loops over y until 1+Dy^2 is
+	 * a perfect square. */
+
+	public static long isPerfectSquare(long x) {
+		long s = (long) Math.sqrt(x);
+		return s*s==x ? s : -1;
+	}
+
+	public static long minimalSolution(long d) {
+		long y = 1;
+		long x = 0;
+		while ((x=isPerfectSquare(1 + d*y*y)) < 0) y++;
+		return x;
+	}
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
-		int t = Integer.parseInt(s.nextLine());
-		for (int t0 = 0; t0 < t; t0++) {
-			
+		int N = Integer.parseInt(s.nextLine());
+		long max = 0;
+		long ans = 0;
+		for (int d = 2; d <= N; d++) {
+			if (isPerfectSquare(d) > 0) continue;
+			long res = minimalSolution(d);
+			if (res > max) {
+				max = res;
+				ans = d;
+			}
 		}
+		System.out.println(ans);
 		s.close();
 	}
 }

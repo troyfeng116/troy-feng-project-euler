@@ -55,7 +55,9 @@ public class Euler064 {
 	 * repeat, we have a cycle. Rationalizing gives m(sqrt(x)+n)/(x-n^2). We want to write as 
 	 * a+(sqrt(x) - b)/p. I'm thinking we can have a rationalize function that takes in (a,b) to rationalize
 	 * something of the form a/(sqrt(n) - b), and returns (a,b,c) where a + (sqrt(n) - b)/c is the
-	 * rationalized form. Then we continue with (b,c). */
+	 * rationalized form. Then we continue with (b,c). Each step is essentially a new approximation.
+	 *
+	 * Note that all cycles start right after the first a0 approximation. */
 
 	static class Triple {
 		int first;
@@ -66,39 +68,36 @@ public class Euler064 {
 			second = s;
 			third = t;
 		}
+		public boolean equals(Triple t) {
+			return first == t.first && second == t.second && third == t.third;
+		}
 	}
 
-	public int gcd(int a, int b) {
-		if (a == b) return a;
-		if (a == 0) return b;
-		if (b == 0) return a;
-		return gcd(b, a%b);
-	}
+	/* Continue fraction x/(sqrt(n) - y) to the form a + (sqrt(n)-b)/c, where b is largest integer <= a0.
+	 * Return triple(a,b,c). */
+	public static Triple rationalize(int x, int y, int n, int a0) {
+		int a = 0;
+		int b = x*y;
+		int c = n - y*y;
 
-	/* Rationalize the expression x/(sqrt(n) - y) to the form a + (sqrt(n)-b)/c. Return triple(a,b,c). */
-	public Triple rationalize(int x, int y, int n) {
-		int n1 = x;
-		int n2 = x*y;
-		int d = n-y*y;
-		int gcd = gcd(x,d);
-		n1 /= gcd;
-		n2 /= gcd;
-		d /= gcd;
+		a = (b+a0)%c + 1;
+		b -= a*c;
+		b *= -1;
+		return new Triple(a,b,c);
 	}
 
 	/* At the start of the first iteration, we have a0 + (sqrt(n) - a0). So we have to rationalize
 	 * 1/(sqrt(n) - a0) first. */
 	public static int findCycle(int n, int a0) {
 		Set<Triple> set = new HashSet<Triple>();
-		Triple t = rationalize(1, a0, n);
-		int first = 1;
+		Triple t = rationalize(1, a0, n, a0);
 		int count = 1;
 		while (!set.contains(t)) {
 			set.add(t);
-			t = rationalize(t.second, t.third, n);
+			t = rationalize(t.second, t.third, n, a0);
 			count++;
 		}
-		return first;
+		return count-1;
 	}
 	
 	public static void main(String[] args) {

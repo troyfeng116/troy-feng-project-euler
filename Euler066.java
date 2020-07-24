@@ -85,8 +85,8 @@ public class Euler066 {
 	 * have p_0 = a0 and p_1 = a0*a1+1, and q_0 = 1 and q_1 = a1. */
 	public static long minimalSolution(int d) {
 		List<Integer> cycle = findCycle(d);
-		for (int i: cycle) System.out.print(i + " ");
-		System.out.println();
+		//for (int i: cycle) System.out.print(i + " ");
+		//System.out.println();
 		int len = cycle.size();
 		/* Numerator and denominator two terms ago (a0 and 1, respectively). */
 		long x2 = (long) Math.sqrt(d);
@@ -99,11 +99,11 @@ public class Euler066 {
 		long y = y1;
 		int n = 2;
 		while (x*x - d*y*y != 1) {
-			System.out.println(x + "/" + y);
+			//System.out.println(x + "/" + y);
 			int i = n%len-1;
 			if (i < 0) i += len;
 			int a = cycle.get(i);
-			System.out.println("n=" + n + " a=" + a);
+			//System.out.println("n=" + n + " a=" + a);
 			x = a*x1+x2;
 			y = a*y1+y2;
 			x2 = x1;
@@ -131,7 +131,7 @@ public class Euler066 {
 			}
 		}
 		System.out.println(ans);
-		System.out.println(max);
+		//System.out.println(max);
 		s.close();
 	}
 }

@@ -23,11 +23,31 @@ public class Euler067 {
 	/* Thoughts/approach: DP. To find max sum from top to i'th row, we need all max sums from top to
 	 * (i-1)th row. So we keep an array memoizing max sums in each spot on the triangle. */
 
+	/* Given jagged array triangle, return maximum path sum from top to bottom. */
 	public static int solution(int[][] triangle) {
 		int n = triangle.length;
-		for (int row = 0; row < n; row++) {
-			
+		int[][] dp = new int[n][];
+		dp[0] = new int[] {triangle[0][0]};
+		dp[1] = new int[] {triangle[1][0]+triangle[0][0], triangle[1][1]+triangle[0][0]};
+		/* For every (0-based) row except bottom row, starting from 3rd row */
+		for (int row = 2; row < n-1; row++) {
+			dp[row] = new int[row+1];
+			int[] tRow = triangle[row];
+			/* There's only one path to get to the left-most and right-most edges of triangle */
+			dp[row][0] = tRow[0] + dp[row-1][0];
+			dp[row][row] = tRow[row] + dp[row-1][row-1];
+			/* For each of the middle elements in row, choose max path to that point */
+			for (int i = 1; i < row; i++) {
+				dp[row][i] = Math.max(dp[row-1][i],dp[row-1][i-1]) + tRow[i];
+			}
 		}
+		/* Find max path to bottom row. */
+		int[] lastRow = triangle[n-1];
+		int ans = lastRow[0] + dp[n-2][0];
+		for (int i = 1; i < n-1; i++) {
+			ans = Math.max(ans, Math.max(dp[n-2][i],dp[n-2][i-1])+lastRow[i]);
+		}
+		return Math.max(ans, lastRow[n-1]+dp[n-2][n-2]);
 	}
 	
 	public static void main(String[] args) {
@@ -38,12 +58,12 @@ public class Euler067 {
 			int[][] triangle = new int[n][];
 			for (int row = 1; row <= n; row++) {
 				String[] inputs = s.nextLine().split(" ");
-				triangle[row] = new int[row];
+				triangle[row-1] = new int[row];
 				for (int i = 0; i < row; i++) {
-					triangle[row][i] = Integer.parseInt(inputs[i]);
+					triangle[row-1][i] = Integer.parseInt(inputs[i]);
 				}
 			}
-			System.out.println(ans);
+			System.out.println(solution(triangle));
 		}
 		s.close();
 	}

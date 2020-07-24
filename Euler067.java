@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* By starting at the top of the triangle below and moving to adjacent numbers on the row below, the 
  * maximum total from top to bottom is 23:
@@ -28,7 +28,9 @@ public class Euler067 {
 		int n = triangle.length;
 		int[][] dp = new int[n][];
 		dp[0] = new int[] {triangle[0][0]};
+		if (n==1) return dp[0][0];
 		dp[1] = new int[] {triangle[1][0]+triangle[0][0], triangle[1][1]+triangle[0][0]};
+		if (n==2) return Math.max(dp[1][0], dp[1][1]);
 		/* For every (0-based) row except bottom row, starting from 3rd row */
 		for (int row = 2; row < n-1; row++) {
 			dp[row] = new int[row+1];

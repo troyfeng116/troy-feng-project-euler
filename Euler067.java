@@ -27,6 +27,7 @@ public class Euler067 {
 	public static int solution(int[][] triangle) {
 		int n = triangle.length;
 		int[][] dp = new int[n][];
+		/* Handle base/edge cases for height 1 and 2 triangle */
 		dp[0] = new int[] {triangle[0][0]};
 		if (n==1) return dp[0][0];
 		dp[1] = new int[] {triangle[1][0]+triangle[0][0], triangle[1][1]+triangle[0][0]};

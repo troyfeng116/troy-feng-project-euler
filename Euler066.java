@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Consider quadratic Diophantine equations of the form:
  *
@@ -25,6 +25,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.math.BigInteger;
 
 public class Euler066 {
 	
@@ -42,8 +43,8 @@ public class Euler066 {
 	 * one function to generate numerators using those continued fraction terms until we find (x,y) 
 	 * satisfying Pell's equation for D. */
 
-	/* Given x,y representing x/(sqrt(d)-y), continue fraction. Add next a to list, return (b,c)
-	 * after continuing to a + (sqrt(d)-b)/c and add new a to cycle.*/
+	/* Given x,y representing x/(sqrt(d)-y), continue fraction. Add next a to list, return (b,c) after
+	 * continuing to a + (sqrt(d)-b)/c and add new a to cycle. */
 	public static int[] continueFrac(int x, int y, int d, int a0, List<Integer> cycle) {
 		int a = 0;
 		int b = y;
@@ -56,7 +57,7 @@ public class Euler066 {
 		return new int[] {b,c};
 	}
 
-	/* If sqrt(d) can be written as continued fraction [a0;(a1,...,ak)], return a1,...,ak in list. */
+	/* If sqrt(d) can be written as continued fraction [a0;(a1,...,ak)], return cycle (a1,...,ak) in list. */
 	public static List<Integer> findCycle(int d) {
 		List<Integer> ans = new ArrayList<Integer>();
 		int a0 = (int) Math.sqrt(d);
@@ -82,30 +83,35 @@ public class Euler066 {
 
 	/* First, find cycle of continued frac for sqrt(d). Then, use recurrence relation for continued fractions.
 	 * The n'th numerator p_n is given by p_n = a_n*(p_{n-1}) + p_{n-2}, and same for denominator a_n. We 
-	 * have p_0 = a0 and p_1 = a0*a1+1, and q_0 = 1 and q_1 = a1. */
-	public static long minimalSolution(int d) {
-		List<Integer> cycle = findCycle(d);
-		//for (int i: cycle) System.out.print(i + " ");
-		//System.out.println();
-		int len = cycle.size();
+	 * have p_0 = a0 and p_1 = a0*a1+1, and q_0 = 1 and q_1 = a1.
+	 * https://en.wikipedia.org/wiki/Continued_fraction */
+	public static BigInteger minimalSolution(int d) {
+		List<Integer> cycle1 = findCycle(d);
+		int len = cycle1.size();
+		/* Convert cycle to BigIntegers in array. */
+		BigInteger[] cycle = new BigInteger[len];
+		for (int i = 0; i < len; i++) {
+			cycle[i] = new BigInteger(Integer.toString(cycle1.get(i)));
+		}
+		BigInteger d1 = new BigInteger(Integer.toString(d));
 		/* Numerator and denominator two terms ago (a0 and 1, respectively). */
-		long x2 = (long) Math.sqrt(d);
-		long y2 = 1;
+		BigInteger x2 = new BigInteger(Integer.toString((int) Math.sqrt(d)));
+		BigInteger y2 = BigInteger.ONE;
 		/* Numerator and denominator one term ago (a0*a1+1 and a1, respectively). */
-		long x1 = x2*cycle.get(0)+1;
-		long y1 = cycle.get(0);
+		BigInteger x1 = x2.multiply(cycle[0]).add(BigInteger.ONE);
+		BigInteger y1 = cycle[0];
 		/* Current numerator and denominator. */
-		long x = x1;
-		long y = y1;
+		BigInteger x = x1;
+		BigInteger y = y1;
 		int n = 2;
-		while (x*x - d*y*y != 1) {
-			//System.out.println(x + "/" + y);
+		/* While x and y don't satisfy Pell's equation for d, generate next x and y using continued
+		 * fraction recurrence relation. */
+		while (!x.multiply(x).subtract(d1.multiply(y).multiply(y)).equals(BigInteger.ONE)) {
 			int i = n%len-1;
 			if (i < 0) i += len;
-			int a = cycle.get(i);
-			//System.out.println("n=" + n + " a=" + a);
-			x = a*x1+x2;
-			y = a*y1+y2;
+			BigInteger a = cycle[i];
+			x = a.multiply(x1).add(x2);
+			y = a.multiply(y1).add(y2);
 			x2 = x1;
 			y2 = y1;
 			x1 = x;
@@ -116,22 +122,19 @@ public class Euler066 {
 	}
 	
 	public static void main(String[] args) {
-		//System.out.println(minimalSolution(13));
-		//System.exit(0);
 		Scanner s = new Scanner(System.in);
 		int N = Integer.parseInt(s.nextLine());
-		long max = 0;
-		long ans = 0;
+		BigInteger max = BigInteger.ZERO;
+		int ans = 0;
 		for (int d = 2; d <= N; d++) {
 			if (isPerfectSquare(d)) continue;
-			long res = minimalSolution(d);
-			if (res > max) {
+			BigInteger res = minimalSolution(d);
+			if (res.compareTo(max) > 0) {
 				max = res;
 				ans = d;
 			}
 		}
 		System.out.println(ans);
-		//System.out.println(max);
 		s.close();
 	}
 }

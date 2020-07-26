@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Euler's Totient function, phi(n) [sometimes called the phi function], is used to determine the number of
  * numbers less than n which are relatively prime to n. For example, as 1,2,4,5,7, and 8, are all less than 
@@ -33,7 +33,9 @@ public class Euler069 {
 	 * want to minimize the PROD_{p|n} (1 - 1/p), which means we want to maximize the distinct prime factors 
 	 * of n while minimizing n. The smallest n maximizing {p|n} are 2, 2*3, 2*3*5, 2*3*5*7, 2*3*5*7*11,..... T
 	 * hat is, the solution for N is the largest product of consecutive primes < N, starting from 2; there are 
-	 * no smaller numbers with more distinct prime factors. */
+	 * no smaller numbers with more distinct prime factors.
+	 *
+	 * PRECALCULATION: the product of the first 15 primes (2 through 47) is still less than 10^18. */
 
 	static final long MAX_N = (long) 1E18;
 	static boolean[] composite;
@@ -42,16 +44,16 @@ public class Euler069 {
 
 	/* Sieve primes until product exceeds MAX_N. */
 	public static void sieve() {
-		composite = new boolean[200];
-		productPrimes = new long[100];
+		composite = new boolean[48];
+		productPrimes = new long[15];
 		long product = 1;
 		int index = 0;
-		for (int i = 2; i < 500 && product <= MAX_N/i; i++) {
+		for (int i = 2; i < composite.length && product <= MAX_N/i; i++) {
 			if (!composite[i]) {
 				product *= i;
 				productPrimes[index] = product;
 				index++;
-				for (int j = i*i; j < 500; j+=i) {
+				for (int j = i*i; j < composite.length; j+=i) {
 					composite[j] = true;
 				}
 			}
@@ -65,7 +67,7 @@ public class Euler069 {
 		for (int t0 = 0; t0 < t; t0++) {
 			long n = Long.parseLong(s.nextLine());
 			int i = 0;
-			while (productPrimes[i+1] != 0 && productPrimes[i+1] < n) i++;
+			while (i+1 < productPrimes.length && productPrimes[i+1] < n) i++;
 			System.out.println(productPrimes[i]);
 		}
 		s.close();

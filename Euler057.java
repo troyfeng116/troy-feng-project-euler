@@ -41,7 +41,7 @@ public class Euler057 {
 		double convert = Math.log(2) / Math.log(10);
   		int digits = (int) (convert * n.bitLength() + 1);
   		if (BigInteger.TEN.pow(digits-1).compareTo(n) > 0) {
-    		return digits-1;
+  			return digits-1;
   		}
   		return digits;
 	}
@@ -53,7 +53,6 @@ public class Euler057 {
 		BigInteger b = BigInteger.ONE;
 		BigInteger twoConst = new BigInteger("2");
 		for (int iteration = 0; iteration <= n; iteration++) {
-			//System.out.println(a.toString() + " " + b.toString());
 			if (numDigits(a) > numDigits(b)) {
 				System.out.println(iteration);
 			}

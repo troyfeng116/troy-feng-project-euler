@@ -41,14 +41,19 @@ import java.util.Scanner;
 
 public class Euler068 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: We have to place the numbers 1 through N in an N-gon ring such that each of the
+	 * sequences of 3 integers (1 outer, 2 inner) add to S. I think I will represent the inner and outer rings
+	 * as arrays of N integers. inner[0],...,inner[N-1] will be the inner ring. outer[i] will be the outer
+	 * ring corresponding to the two inner rings with inner[i] as the further node. I.e. for N=5, inner[0],
+	 * inner[1], and outer[0] will form a sum, inner[4], inner[0], and outer[4] will form a sum, etc. Finally,
+	 * we can fill inner[] one element at a time, backtracking when we run out of numbers to fill. */
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
-		int t = Integer.parseInt(s.nextLine());
-		for (int t0 = 0; t0 < t; t0++) {
-			
-		}
+		String[] inputs = s.nextLine().split(" ");
+		int N = Integer.parseInt(inputs[0]);
+		int S = Integer.parseInt(inputs[1]);
+
 		s.close();
 	}
 }

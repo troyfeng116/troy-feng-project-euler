@@ -20,13 +20,21 @@ import java.util.Scanner;
 
 public class Euler071 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: Ordering the rationals is a pretty interesting problem. See the following:
+	 *
+	 * 	https://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree
+	 *	https://en.wikipedia.org/wiki/Farey_sequence
+	 *
+	 *  */
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
-			
+			String[] inputs = s.nextLine().split(" ");
+			int a = Integer.parseInt(inputs[0]);
+			int b = Integer.parseInt(inputs[1]);
+			long N = Long.parseLong(inputs[2]);
 		}
 		s.close();
 	}

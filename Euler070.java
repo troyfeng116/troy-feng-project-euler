@@ -16,12 +16,42 @@ import java.util.Scanner;
 
 public class Euler070 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: we can find all values of phi(n) using a modified prime sieve. Then I suppose we
+	 * loop over [1,N] again, finding values n such that n and phi(n) are permutations, and storing n
+	 * corresponding to minimum n/phi(n). */
+
+	/* phi[k] stores phi(k). */
+	static int[] phi;
+
+	/* Modified Sieve of Eratosthenes. Since phi(n) = n * PROD{p|n} (1 - 1/p), if we sieve over all primes
+	 * less than N and multiply all multiples of primes by 1-1/p, we will end up with a table of Euler's
+	 * Totient function values. */
+	public static void sieve(int N) {
+		phi = new int[N+1];
+		for (int i = 2; i <= N; i++) {
+			phi[i] = i;
+		}
+		for (int i = 2; i <= N; i++) {
+			/* If i is prime, sieve over its multiples. */
+			if (phi[i] == i) {
+				/* phi(p) = p-1. */
+				phi[i]--;
+				/* Multiply all multiples of p by (1-1/p). */
+				for (int j = 2*i; j <= N; j+=i) {
+					phi[j] /= i;
+					phi[j] *= (i-1);
+				}
+			}
+		}
+	}
+
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int N = Integer.parseInt(s.nextLine());
-		
+		sieve(N);
+		//for (int i: phi) System.out.println(i);
+		System.out.println("done");
 		s.close();
 	}
 }

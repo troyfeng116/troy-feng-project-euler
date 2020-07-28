@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Euler's Totient function, phi(n) [sometimes called the phi function], is used to determine the number of 
  * positive numbers less than or equal to n which are relatively prime to n. For example, as 1,2,4,5,7, and 8
@@ -22,6 +22,7 @@ public class Euler070 {
 
 	/* phi[k] stores phi(k). */
 	static int[] phi;
+	static long[] tenToThe;
 
 	/* Modified Sieve of Eratosthenes. Since phi(n) = n * PROD{p|n} (1 - 1/p), if we sieve over all primes
 	 * less than N and multiply all multiples of primes by 1-1/p, we will end up with a table of Euler's
@@ -45,13 +46,52 @@ public class Euler070 {
 		}
 	}
 
+	public static void fillTenToThe() {
+		tenToThe = new long[10];
+		tenToThe[0] = 1;
+		for (int i = 1; i < tenToThe.length; i++) {
+			tenToThe[i] = tenToThe[i-1]*10;
+		}
+	}
+
+	/* Return count-of-digits representation of n. i.e. 13563 -> 0001102010. */
+	public static long countOfDigits(int n) {
+		long ans = 0;
+		while (n != 0) {
+			ans += tenToThe[n%10];
+			n /= 10;
+		}
+		return ans;
+	}
+
+	/* Return true if digits of n and k are permutations of each other. */
+	public static boolean isPermutation(int n, int k) {
+		return countOfDigits(n) == countOfDigits(k);
+	}
+
+	/* Return 1 < n < N s.t. phi(n) is permutation of n, and n/phi(n) is minimized for n:(1,N). */
+	public static int solution(int N) {
+		int ans = 0;
+		int minN = 1;
+		int minPhi = 0;
+		for (int n = 2; n < N; n++) {
+			if (isPermutation(n, phi[n])) {
+				if ((long) n*minPhi < (long) minN*phi[n]) {
+					ans = n;
+					minN = n;
+					minPhi = phi[n];
+				}
+			}
+		}
+		return ans;
+	}
 	
 	public static void main(String[] args) {
+		fillTenToThe();
 		Scanner s = new Scanner(System.in);
 		int N = Integer.parseInt(s.nextLine());
 		sieve(N);
-		//for (int i: phi) System.out.println(i);
-		System.out.println("done");
+		System.out.println(solution(N));
 		s.close();
 	}
 }

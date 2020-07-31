@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Consider the fraction, n/d, where n and d are positive integers. If n < d and GCD(n,d) = 1, it is called a 
  * reduced proper fraction.
@@ -26,7 +26,7 @@ public class Euler072 {
 	/* phi[k] holds phi(k). */
 	static int[] phi;
 	/* numFarey[k] holds the number of terms in the Farey sequence of order k, not including 0 and 1. */
-	static int[] numFarey;
+	static long[] numFarey;
 
 	/* Modified prime sieve that computes phi(k) for all 2 <= k <= MAX_N. */
 	public static void sieve() {
@@ -46,7 +46,7 @@ public class Euler072 {
 	/* Given phi(k) for all 2 <= k <= MAX_N, calculate the number of terms in F_k for 2 <= k <= MAX_N using
 	 * the fact that |F_k| = phi(k) + |F_{k-1}|. */
 	public static void fillNumFarey() {
-		numFarey = new int[MAX_N+1];
+		numFarey = new long[MAX_N+1];
 		for (int k = 2; k <= MAX_N; k++) {
 			numFarey[k] = phi[k] + numFarey[k-1];
 		}

@@ -35,49 +35,45 @@ public class Euler071 {
 	 * EDIT: the above only applies if p/q is in a Farey sequence of order q. Another useful tool is that
 	 * if a/b has neighbors x/y and w/z, then a/b is the mediant of x/y and w/z. That is, a/b = (x+w)/(y+z).
 	 * So if we keep finding mediants and kinda binary searching as we go until y or z exceeds N, I think
-	 * we'll end up with the L and R Farey neighbors of a/b. */
+	 * we'll end up with the L and R Farey neighbors of a/b.
+	 *
+	 * At any step, we have neighbors x/y and w/z, such that x/y < p/q < w/z. Then the next term between
+	 * x/y and w/z is (x+w)/(y+z). If p/q is less than mediant, search between x/y and mediant. Else if
+	 * greater, search between mediant and w/z. Else if equal, take mediant between mediant and p/q until
+	 * denominator exceeds N. Once y or z exceeds N, we stop. */
 
-	/* If a/b = [0;a_1,...,a_n], return those continued fraction coefficients [a_1,...,a_n]. */
-	public static List<Integer> getContinuedFrac(int a, int b) {
-		List<Integer> ans = new ArrayList<Integer>();
-		/* Continue a/b. */
-		while (a != 1) {
-			int x = b/a;
-			ans.add(x);
-			b -= x*a;
-			int temp = a;
-			a = b;
-			b = temp;
+	public static long[] findLeftNeighbor(int a, int b, long N) {
+		/* Start with 0/1 and 1/1 as neighbors. */
+		long x = 0;
+		long y = 1;
+		long w = 1;
+		long z = 1;
+		while (x+w < N && y+z < N) {
+			// Mediant is (x+w)/(y+z)
+			long p = x+w;
+			long q = y+z;
+			if (a*q < p*b) { // will need method to compare a/b and p/q
+				w = p;
+				z = q;
+			}
+			else if (a*q > p*b) {
+				x = p;
+				y = q;
+			}
+			/* If mediant = a/b, keep taking mediant of x/y and a/b until y is about to exceed N. */
+			else {
+				while (y+2*b < N) {
+					x+=a;
+					y+=b;
+				}
+				return new long[] {x,y};
+			}
 		}
-		ans.add(b);
-		return ans;
-	}
-
-	/* Given [0;a_1,...,a_n], restore rational p/q using recurrence relation for continued fractions:
-	 * p_k = a_k * (p_{k-1}) + p_{k-2}, where p_0 = a_0 and p_1 = a_0*a_1+1.
-	 * q_k = a_k * (q_{k-1}) + q_{k-2}, where q_0 = 1 and q_1 = a_1. */
-	public static int[] undoContinuedFrac(List<Integer> frac) {
-		int p2 = 0;
-		int q2 = 1;
-		int p1 = 1;
-		int q1 = frac.get(0);
-		int p = p1;
-		int q = q1;
-		for (int n = 1; n < frac.size(); n++) {
-			p = frac.get(n)*p1+p2;
-			q = frac.get(n)*q1+q2;
-			p2 = p1;
-			q2 = q1;
-			p1 = p;
-			q1 = q;
-		}
-		return new int[] {p,q};
+		return new long[] {x,y};
 	}
 
 	public static void main(String[] args) {
-		List<Integer> list = getContinuedFrac(17,61);
-		for (int i: list) System.out.println(i);
-		int[] test = undoContinuedFrac(list);
+		long[] test = findLeftNeighbor(3,7,8);
 		System.out.println(test[0] + " " + test[1]);
 		System.exit(0);
 		Scanner s = new Scanner(System.in);

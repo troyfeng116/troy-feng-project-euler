@@ -30,7 +30,12 @@ public class Euler071 {
 	 * Of use to us in particular are the following facts:
 	 * 1. All rationals <= 1 can be written as finite continued fractions [0;a_1,...,a_n]
 	 * 2. Rational -> continued frac is bijective if we require a_n!=1 since [a_1,...,1] = [a1,...,a_{n-1}+1]
-	 * 3. If p/q = [0;a_1,...,a_n + 1], then Farey neighbors are [0;a_1,...,a_n] and [0;a_1,...,a_{n-1}] */
+	 * 3. If p/q = [0;a_1,...,a_n + 1], then Farey neighbors are [0;a_1,...,a_n] and [0;a_1,...,a_{n-1}]
+	 *
+	 * EDIT: the above only applies if p/q is in a Farey sequence of order q. Another useful tool is that
+	 * if a/b has neighbors x/y and w/z, then a/b is the mediant of x/y and w/z. That is, a/b = (x+w)/(y+z).
+	 * So if we keep finding mediants and kinda binary searching as we go until y or z exceeds N, I think
+	 * we'll end up with the L and R Farey neighbors of a/b. */
 
 	/* If a/b = [0;a_1,...,a_n], return those continued fraction coefficients [a_1,...,a_n]. */
 	public static List<Integer> getContinuedFrac(int a, int b) {
@@ -68,7 +73,7 @@ public class Euler071 {
 		}
 		return new int[] {p,q};
 	}
-	
+
 	public static void main(String[] args) {
 		List<Integer> list = getContinuedFrac(17,61);
 		for (int i: list) System.out.println(i);

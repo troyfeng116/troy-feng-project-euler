@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Consider the fraction, a/b, where a and b are positive integers. If a < b and GCD(a,b) = 1, it is called a 
  * reduced proper fraction.
@@ -42,31 +42,33 @@ public class Euler071 {
 	 * greater, search between mediant and w/z. Else if equal, take mediant between x/y and w/z until
 	 * denominator exceeds N. Once y or z exceeds N, we stop. */
 
+	/* Given a/b and N, find left neighbor of a/b in Farey sequence of order N. */
 	public static long[] findLeftNeighbor(int a, int b, long N) {
-		/* Start with 0/1 and 1/1 as neighbors. */
+		/* Start with 0/1 and 1/1 as L and R neighbors. */
 		long x = 0;
 		long y = 1;
 		long w = 1;
 		long z = 1;
-		while (x+w <= N && y+z <= N) {
-			System.out.println(x + "/" + y + " " + w + "/" + z);
-			// Mediant is (x+w)/(y+z)
+		/* While denominator of next mediant is less than N */
+		while (y+z <= N) {
+			/* Mediant is p/q = (x+w)/(y+z) */
 			long p = x+w;
 			long q = y+z;
-			if (a*q <= p*b) { // will need method to compare a/b and p/q
+			/* If x/y < a/b < p/q, search with L = x/y and R = p/q */
+			if (a*q < p*b) {
 				w = p;
 				z = q;
 			}
+			/* If p/q < a/b < w/z, search with L = p/q and R = w/z */
 			else if (a*q > p*b) {
 				x = p;
 				y = q;
 			}
-			/* If mediant = a/b, keep taking mediant of x/y and a/b until y is about to exceed N. */
+			/* If mediant p/q = a/b, keep taking mediant of x/y and a/b until y is about to exceed N. */
 			else {
-				while (y+2*w <= N) {
-					x+=w;
-					y+=z;
-				}
+				long factor = (N-y)/b;
+				x+=factor*a;
+				y+=factor*b;
 				return new long[] {x,y};
 			}
 		}
@@ -74,9 +76,6 @@ public class Euler071 {
 	}
 
 	public static void main(String[] args) {
-		/*long[] test = findLeftNeighbor(3,7,8);
-		System.out.println(test[0] + " " + test[1]);
-		System.exit(0);*/
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {

@@ -39,7 +39,7 @@ public class Euler071 {
 	 *
 	 * At any step, we have neighbors x/y and w/z, such that x/y < p/q < w/z. Then the next term between
 	 * x/y and w/z is (x+w)/(y+z). If p/q is less than mediant, search between x/y and mediant. Else if
-	 * greater, search between mediant and w/z. Else if equal, take mediant between mediant and p/q until
+	 * greater, search between mediant and w/z. Else if equal, take mediant between x/y and w/z until
 	 * denominator exceeds N. Once y or z exceeds N, we stop. */
 
 	public static long[] findLeftNeighbor(int a, int b, long N) {
@@ -48,11 +48,12 @@ public class Euler071 {
 		long y = 1;
 		long w = 1;
 		long z = 1;
-		while (x+w < N && y+z < N) {
+		while (x+w <= N && y+z <= N) {
+			System.out.println(x + "/" + y + " " + w + "/" + z);
 			// Mediant is (x+w)/(y+z)
 			long p = x+w;
 			long q = y+z;
-			if (a*q < p*b) { // will need method to compare a/b and p/q
+			if (a*q <= p*b) { // will need method to compare a/b and p/q
 				w = p;
 				z = q;
 			}
@@ -62,9 +63,9 @@ public class Euler071 {
 			}
 			/* If mediant = a/b, keep taking mediant of x/y and a/b until y is about to exceed N. */
 			else {
-				while (y+2*b < N) {
-					x+=a;
-					y+=b;
+				while (y+2*w <= N) {
+					x+=w;
+					y+=z;
 				}
 				return new long[] {x,y};
 			}
@@ -73,9 +74,9 @@ public class Euler071 {
 	}
 
 	public static void main(String[] args) {
-		long[] test = findLeftNeighbor(3,7,8);
+		/*long[] test = findLeftNeighbor(3,7,8);
 		System.out.println(test[0] + " " + test[1]);
-		System.exit(0);
+		System.exit(0);*/
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
@@ -83,6 +84,8 @@ public class Euler071 {
 			int a = Integer.parseInt(inputs[0]);
 			int b = Integer.parseInt(inputs[1]);
 			long N = Long.parseLong(inputs[2]);
+			long[] res = findLeftNeighbor(a,b,N);
+			System.out.println(res[0] + " " + res[1]);
 		}
 		s.close();
 	}

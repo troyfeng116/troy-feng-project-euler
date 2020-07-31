@@ -17,13 +17,17 @@ import java.util.Scanner;
 
 public class Euler072 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: For each d >= 2, there are phi(d) rational numbers with d in the denominator, where
+	 * phi is Euler's totient function. We can efficiently precompute phi(d) up to 10^6 using a modified
+	 * prime sieve, since phi(n) = n * PROD_{p|n} (1 - 1/p). */
+
+	static final int MAX_N;
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
-			
+			int n = Integer.parseInt(s.nextLine());
 		}
 		s.close();
 	}

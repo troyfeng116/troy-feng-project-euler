@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* Consider the fraction, n/d, where n and d are positive integers. If n < d and GCD(n,d) = 1, it is called a 
  * reduced proper fraction.
@@ -30,7 +30,9 @@ public class Euler073 {
 	 * are less than x. Out of those, we don't want to include non-reduced fractions: that is, we don't want
 	 * to include SUM_{t<q, t|q} S_t. Thus, S_q = floor(x*q) - SUM_{t<q, t|q} S_t, where floor(x*q) is the count
 	 * of all (including unreduced) fractions <= x and SUM{t<q,t|q} S_t is the count of unreduced fractions.
-	 * Finally, rank(x) = SUM_{q:1->D} S_q. */
+	 * Finally, rank(x) = SUM_{q:1->D} S_q.
+	 *
+	 * For more on this algorithm and ranking fractions: https://people.csail.mit.edu/mip/papers/farey/talk.pdf */
 
 	/* Given n,d,D, return S such that for k<=D, S[k] holds the number of reduced fractions with denominator
 	 * k that are <= n/d. In other words, return S_k from the description above. We do this using a sieve-like
@@ -39,10 +41,10 @@ public class Euler073 {
 	 * ans[q] = S_q, using a bottom-up Sieve/DP-like algorithm. */
 	public static int[] findCountLess(int n, int d, int D) {
 		int[] ans = new int[D+1];
-		for (int q = 1; q <= D; q++) {
-			ans[q] = (int) ((double)n/d*q);
+		for (int q = 0; q <= D; q++) {
+			ans[q] = n*q/d;
 		}
-		for (int t = 2; t <= D; t++) {
+		for (int t = 1; t <= D; t++) {
 			for (int q = 2*t; q <= D; q+=t) {
 				ans[q] -= ans[t];
 			}
@@ -51,10 +53,9 @@ public class Euler073 {
 	}
 
 	/* Find rank(n/d) in F_D. */
-	public static int rank(int n, int d, int D) {
-		int total = (int) ((double)n/d*D);
+	public static long rank(int n, int d, int D) {
 		int[] S = findCountLess(n,d,D);
-		int ans = 0;
+		long ans = 0;
 		for (int i: S) ans += i;
 		return ans;
 	}
@@ -64,7 +65,8 @@ public class Euler073 {
 		String[] inputs = s.nextLine().split(" ");
 		int A = Integer.parseInt(inputs[0]);
 		int D = Integer.parseInt(inputs[1]);
-		System.out.println(rank(1,A,D) - rank(1,A+1,D) - 1);
+		long ans = rank(1,A,D)-rank(1,A+1,D)-1;
+		System.out.println(Math.max(ans,0));
 		s.close();
 	}
 }

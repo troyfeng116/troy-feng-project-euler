@@ -18,13 +18,21 @@ import java.util.Scanner;
 
 public class Euler073 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: take mediants until denominator exceeds D? */
+
+	/* Given that n1/d1 < n2/d2 and are Farey neighbors, return count of rationals between them. */
+	public static int search(int n1, int d1, int n2, int d2, int D) {
+		if (d1+d2 > D) return 0;
+		System.out.println((n1+n2) + "/" + (d1+d2));
+		return 1 + search(n1,d1,n1+n2,d1+d2,D) + search(n1+n2,d1+d2,n2,d2,D);
+	}
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
 		String[] inputs = s.nextLine().split(" ");
 		int A = Integer.parseInt(inputs[0]);
 		int D = Integer.parseInt(inputs[1]);
+		System.out.println(search(1, A+1, 1, A, D));
 		s.close();
 	}
 }

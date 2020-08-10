@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* The number 145 is well known for the property that the sum of the factorial of its digits is equal 
  * to 145:
@@ -71,6 +71,7 @@ public class Euler074 {
 		return ans;
 	}
 
+	/* Fill chain[] with lengths of chains of all k <= MAX_N. */
 	public static void computeChainLengths() {
 		/* Largest possible factorial digit sum is for 999999. */
 		chain = new int[6*factorial[9]+1];
@@ -79,9 +80,10 @@ public class Euler074 {
 		chain[169] = chain[363601] = chain[1454] = 3;
 		chain[871] = chain[45361] = 2;
 		chain[872] = chain[45362] = 2;
-		/* After pl */
+		/* After playing with inputs, discovered 40585 is also a self-loop. */
 		chain[1] = 1;
 		chain[2] = 1;
+		chain[40585] = 1;
 		for (int k = 0; k <= MAX_N; k++) {
 			if (chain[k] == 0) {
 				List<Integer> newChain = new ArrayList<Integer>();
@@ -98,6 +100,7 @@ public class Euler074 {
 	
 	public static void main(String[] args) {
 		fillFactorial();
+		/* Precompute chain lengths of all k <= MAX_N. */
 		computeChainLengths();
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
@@ -105,12 +108,23 @@ public class Euler074 {
 			String[] inputs = s.nextLine().split(" ");
 			int N = Integer.parseInt(inputs[0]);
 			int L = Integer.parseInt(inputs[1]);
-			String ans = "";
+			/* Print in correct format (space separated, no space at end). */
+			boolean found = false;
+			int prev = 0;
 			for (int k = 0; k <= N; k++) {
-				if (chain[k] == L) ans += k+" ";
+				if (chain[k] == L) {
+					if (!found) {
+						found = true;
+						prev = k;
+					}
+					else {
+						System.out.print(prev + " ");
+						prev = k;
+					}
+				}
 			}
-			if (ans.length() == 0) ans = "-1";
-			System.out.println(ans.trim());
+			if (!found) System.out.println("-1");
+			else System.out.println(prev);
 		}
 		s.close();
 	}

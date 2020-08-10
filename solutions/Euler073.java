@@ -18,12 +18,23 @@ import java.util.Scanner;
 
 public class Euler073 {
 	
-	/* Thoughts/approach: take mediants until denominator exceeds D? */
+	/* Thoughts/approach: Initial approach was to take mediants until denominator exceeds D. This throws a
+	 * stack overflow error for small A and large D.
+	 *
+	 * It would be helpful if we knew the number of terms of F_D less than 1/(A+1) and the number of terms
+	 * less than 1/A. In Farey sequences, the number of irreducible fractions p/q <= x where q <= D is called
+	 * rank(x). Our final answer should be rank(1/A) - rank(1/(A+1)) - 1.
+	 *
+	 * Let x = n/d. How do we find rank(x)? Let q <= d, and let S_q denote the set of all Farey fractions 
+	 * with denominator q <= d. There are floor(x*q) TOTAL possibly unreduced fractions with denominator q that
+	 * are less than x. Out of those, we don't want to include non-reduced fractions: that is, we don't want
+	 * to include SUM_{t<q, t|q} S_t. Thus, S_q = floor(x*q) - SUM_{t<q, t|q} S_t, where floor(x*q) is the count
+	 * of all (including unreduced) fractions <= x and SUM{t<q,t|q} S_t is the count of unreduced fractions.
+	 * Finally, rank(x) = SUM_{q:1->d} S_q. */
 
 	/* Given that n1/d1 < n2/d2 and are Farey neighbors, return count of rationals between them. */
 	public static int search(int n1, int d1, int n2, int d2, int D) {
 		if (d1+d2 > D) return 0;
-		System.out.println((n1+n2) + "/" + (d1+d2));
 		return 1 + search(n1,d1,n1+n2,d1+d2,D) + search(n1+n2,d1+d2,n2,d2,D);
 	}
 	

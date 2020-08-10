@@ -25,17 +25,38 @@ public class Euler073 {
 	 * less than 1/A. In Farey sequences, the number of irreducible fractions p/q <= x where q <= D is called
 	 * rank(x). Our final answer should be rank(1/A) - rank(1/(A+1)) - 1.
 	 *
-	 * Let x = n/d. How do we find rank(x)? Let q <= d, and let S_q denote the set of all Farey fractions 
-	 * with denominator q <= d. There are floor(x*q) TOTAL possibly unreduced fractions with denominator q that
+	 * Let x = n/d. How do we find rank(x) in F_D? Let q <= D, and let S_q denote the set of all Farey fractions 
+	 * with denominator q <= D. There are floor(x*q) TOTAL possibly unreduced fractions with denominator q that
 	 * are less than x. Out of those, we don't want to include non-reduced fractions: that is, we don't want
 	 * to include SUM_{t<q, t|q} S_t. Thus, S_q = floor(x*q) - SUM_{t<q, t|q} S_t, where floor(x*q) is the count
 	 * of all (including unreduced) fractions <= x and SUM{t<q,t|q} S_t is the count of unreduced fractions.
-	 * Finally, rank(x) = SUM_{q:1->d} S_q. */
+	 * Finally, rank(x) = SUM_{q:1->D} S_q. */
 
-	/* Given that n1/d1 < n2/d2 and are Farey neighbors, return count of rationals between them. */
-	public static int search(int n1, int d1, int n2, int d2, int D) {
-		if (d1+d2 > D) return 0;
-		return 1 + search(n1,d1,n1+n2,d1+d2,D) + search(n1+n2,d1+d2,n2,d2,D);
+	/* Given n,d,D, return S such that for k<=D, S[k] holds the number of reduced fractions with denominator
+	 * k that are <= n/d. In other words, return S_k from the description above. We do this using a sieve-like
+	 * approach to deal with the SUM{t<q,t|q} S_t expression. Since S_q = floor(x*q) - SUM_{t<q,t|q} S_t, we
+	 * initialize ans[q] to be floor(x*q). And for all of its factors t|q, we subtract ans[t] = S_t from
+	 * ans[q] = S_q, using a bottom-up Sieve/DP-like algorithm. */
+	public static int[] findCountLess(int n, int d, int D) {
+		int[] ans = new int[D+1];
+		for (int q = 1; q <= D; q++) {
+			ans[q] = (int) ((double)n/d*q);
+		}
+		for (int t = 2; t <= D; t++) {
+			for (int q = 2*t; q <= D; q+=t) {
+				ans[q] -= ans[t];
+			}
+		}
+		return ans;
+	}
+
+	/* Find rank(n/d) in F_D. */
+	public static int rank(int n, int d, int D) {
+		int total = (int) ((double)n/d*D);
+		int[] S = findCountLess(n,d,D);
+		int ans = 0;
+		for (int i: S) ans += i;
+		return ans;
 	}
 	
 	public static void main(String[] args) {
@@ -43,7 +64,7 @@ public class Euler073 {
 		String[] inputs = s.nextLine().split(" ");
 		int A = Integer.parseInt(inputs[0]);
 		int D = Integer.parseInt(inputs[1]);
-		System.out.println(search(1, A+1, 1, A, D));
+		System.out.println(rank(1,A,D) - rank(1,A+1,D) - 1);
 		s.close();
 	}
 }

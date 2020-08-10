@@ -32,13 +32,29 @@ import java.util.Scanner;
 
 public class Euler074 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: definitely memoize the factorials. It seems that memoizing chain lengths 
+	 * might be rather useful as well. Perhaps precalculate all chain lengths up to MAX_N, and use
+	 * recurring chains whenever possible? */
+
+	/* factorial[k] = k!, where k <= 9. */
+	static int[] factorial;
+
+	public static void fillFactorial() {
+		factorial = new int[10];
+		factorial[0] = 1;
+		for (int i = 1; i <= 9; i++) {
+			factorial[i] = factorial[i-1]*i;
+		}
+	}
 	
 	public static void main(String[] args) {
+		fillFactorial();
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
-			
+			String[] inputs = s.nextLine().split(" ");
+			int N = Integer.parseInt(inputs[0]);
+			int L = Integer.parseInt(inputs[1]);
 		}
 		s.close();
 	}

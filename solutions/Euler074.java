@@ -29,15 +29,29 @@
  * a given L, print -1. */
 
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Euler074 {
 	
 	/* Thoughts/approach: definitely memoize the factorials. It seems that memoizing chain lengths 
 	 * might be rather useful as well. Perhaps precalculate all chain lengths up to MAX_N, and use
-	 * recurring chains whenever possible? */
+	 * recurring chains whenever possible? 
+	 *
+	 * We are told that there are only 4 numbers that loop back to themselves: 145, 169, 871, and 872
+	 * (which is kinda cool). This means that every number will eventually enter one of those four
+	 * number's loops. For example, 69 enters 169's loop at 1454. Not only that, but we know that
+	 * 363600 also enters 169's loop at 1454. So for each starting number, we keep finding its digit
+	 * factorial sum until we either i) enter a 145/169/871/872 loop or ii) hit a chain we have already
+	 * previously found. Moreover, while we haven't encountered i) or ii), we can increment all the new
+	 * chains we find on the way. Once we hit i) or ii), we add the length of that found chain to all
+	 * the new chains. */
 
+	static final int MAX_N = 1000000;
 	/* factorial[k] = k!, where k <= 9. */
 	static int[] factorial;
+	/* chain[k] returns the length of the digit factorial chain of k. */
+	static int[] chain;
 
 	public static void fillFactorial() {
 		factorial = new int[10];
@@ -46,15 +60,57 @@ public class Euler074 {
 			factorial[i] = factorial[i-1]*i;
 		}
 	}
+
+	/* Return sum of factorials of digits of n. */
+	public static int digitFactorialSum(int n) {
+		int ans = 0;
+		while (n != 0) {
+			ans += factorial[n%10];
+			n /= 10;
+		}
+		return ans;
+	}
+
+	public static void computeChainLengths() {
+		/* Largest possible factorial digit sum is for 999999. */
+		chain = new int[6*factorial[9]+1];
+		/* Fill in the chains given to us in problem description. */
+		chain[145] = 1;
+		chain[169] = chain[363601] = chain[1454] = 3;
+		chain[871] = chain[45361] = 2;
+		chain[872] = chain[45362] = 2;
+		/* After pl */
+		chain[1] = 1;
+		chain[2] = 1;
+		for (int k = 0; k <= MAX_N; k++) {
+			if (chain[k] == 0) {
+				List<Integer> newChain = new ArrayList<Integer>();
+				int term = k;
+				while (chain[term] == 0) {
+					newChain.add(term);
+					for (int t: newChain) chain[t]++;
+					term = digitFactorialSum(term);
+				}
+				for (int t: newChain) chain[t] += chain[term];
+			}
+		}
+	}
 	
 	public static void main(String[] args) {
 		fillFactorial();
+		computeChainLengths();
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			String[] inputs = s.nextLine().split(" ");
 			int N = Integer.parseInt(inputs[0]);
 			int L = Integer.parseInt(inputs[1]);
+			String ans = "";
+			for (int k = 0; k <= N; k++) {
+				if (chain[k] == L) ans += k+" ";
+			}
+			if (ans.length() == 0) ans = "-1";
+			System.out.println(ans.trim());
 		}
 		s.close();
 	}

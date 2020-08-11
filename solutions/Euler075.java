@@ -24,13 +24,49 @@ import java.util.Scanner;
 
 public class Euler075 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: bijective primitive Pythagorean triple generation using Euclid's formula:
+	 * a = m^2 - n^2, b = 2mn, c = m^2 + n^2, m,n coprime and not both odd. Then increment multiples of
+	 * (a+b+c). */
+
+	static final int MAX_N = 5000000;
+	/* numTriples[L] holds the number of integer right triangles with perimeter L. */
+	static int[] numTriples;
+	/* ans[N] holds the number of L<=N where exactly one integer right triangle can be made. */
+
+	public static int gcd(int a, int b) {
+		if (a == 0) return b;
+		if (b == 0) return a;
+		if (a == b) return a;
+		return gcd(b,a%b);
+	}
+
+	public static void fillNumTriples() {
+		numTriples = new int[MAX_N+1];
+		for (int m = 1; m*m < MAX_N/2; m++) {
+			for (int n = m%2==0? 1:2; n < m; n+=2) {
+				if (gcd(m,n) == 1) {
+					int p = m*m-n*n + 2*m*n + m*m+n*n;
+					if (p <= MAX_N) {
+						for (int l = p; l <= MAX_N; l+=p) {
+							numTriples[l]++;
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	public static void main(String[] args) {
+		fillNumTriples();
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
-			
+			int N = Integer.parseInt(s.nextLine());
+			int count = 0;
+			for (int L = 12; L <= N; L += 2) {
+				if (numTriples[L] == 1) count++;
+			}
+			System.out.println(count);
 		}
 		s.close();
 	}

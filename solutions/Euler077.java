@@ -31,7 +31,7 @@ public class Euler077 {
 	public static void sieve() {
 		composite = new boolean[MAX_N+1];
 		int count = 0;
-		for (int i = 2; i*i <= MAX_N; i++) {
+		for (int i = 2; i <= MAX_N; i++) {
 			if (!composite[i]) {
 				count++;
 				for (int j = i*i; j<=MAX_N; j+=i) {
@@ -50,13 +50,25 @@ public class Euler077 {
 	}
 
 	/* Compute #ways to write 1000 as sum of prime "coins", memoizing in numSums. */
-	
+	public static void fillNumSums() {
+		numSums = new int[MAX_N+1];
+		numSums[0] = 1;
+		for (int c = 0; c < prime.length; c++) {
+			int coin = prime[c];
+			for (int k = coin; k <= MAX_N; k++) {
+				numSums[k] += numSums[k-coin];
+			}
+		}
+	}
 	
 	public static void main(String[] args) {
+		sieve();
+		fillNumSums();
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			int N = Integer.parseInt(s.nextLine());
+			System.out.println(numSums[N]);
 		}
 		s.close();
 	}

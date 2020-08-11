@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* It is possible to write ten as the sum of primes in exactly five different ways:
  *
@@ -25,7 +25,7 @@ public class Euler077 {
 	/* prime[k] holds the k'th prime (zero-based). i.e. prime[0] = 2, prime[1] = 3, etc. */
 	static int[] prime;
 	/* numSums[k] holds the number of ways to write k as the sum of 1+ primes. */
-	static int[] numSums;
+	static long[] numSums;
 
 	/* Sieve primes up to 1000. Then fill prime[] with indexing of those primes. */
 	public static void sieve() {
@@ -51,7 +51,7 @@ public class Euler077 {
 
 	/* Compute #ways to write 1000 as sum of prime "coins", memoizing in numSums. */
 	public static void fillNumSums() {
-		numSums = new int[MAX_N+1];
+		numSums = new long[MAX_N+1];
 		numSums[0] = 1;
 		for (int c = 0; c < prime.length; c++) {
 			int coin = prime[c];

@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* It turns out that 12 cm is the smallest length of wire that can be bent to form an integer sided 
  * right angle triangle in exactly one way, but there are many more examples.
@@ -32,6 +32,7 @@ public class Euler075 {
 	/* numTriples[L] holds the number of integer right triangles with perimeter L. */
 	static int[] numTriples;
 	/* ans[N] holds the number of L<=N where exactly one integer right triangle can be made. */
+	static int[] ans;
 
 	public static int gcd(int a, int b) {
 		if (a == 0) return b;
@@ -40,6 +41,8 @@ public class Euler075 {
 		return gcd(b,a%b);
 	}
 
+	/* Initialize and calculate number of triples that can be made for each L<=MAX_N using Euclid's
+	 * formula for primitive Pythagorean triple generation. */
 	public static void fillNumTriples() {
 		numTriples = new int[MAX_N+1];
 		for (int m = 1; m*m < MAX_N/2; m++) {
@@ -55,18 +58,25 @@ public class Euler075 {
 			}
 		}
 	}
+
+	/* Precompute the number of L<=N with only one right triangle integer triple for all N<=MAX_N. */
+	public static void fillAns() {
+		ans = new int[MAX_N+1];
+		int count = 0;
+		for (int N = 12; N <= MAX_N; N++) {
+			if (numTriples[N] == 1) count++;
+			ans[N] = count;
+		}
+	}
 	
 	public static void main(String[] args) {
 		fillNumTriples();
+		fillAns();
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			int N = Integer.parseInt(s.nextLine());
-			int count = 0;
-			for (int L = 12; L <= N; L += 2) {
-				if (numTriples[L] == 1) count++;
-			}
-			System.out.println(count);
+			System.out.println(ans[N]);
 		}
 		s.close();
 	}

@@ -12,7 +12,19 @@
  * shortest original password possible. If there are multiple choices, select the lexicographically 
  * smallest one.
  *
- * If something went wrong and the original password cannot be recovered, output SMTH WRONG.
+ * If something went wrong and the original password cannot be recovered, output SMTH WRONG. ex. 
+5
+SMH
+TON
+RNG
+WRO
+THG
+ * should output SMTHWRONG, while
+3
+an0
+n/.
+.#a
+ * should output SMTH WRONG.
  *
  * INPUTS: 1 <= T <= 3000 */
 
@@ -20,7 +32,7 @@ import java.util.Scanner;
 
 public class Euler079 {
 	
-	/* Thoughts/approach: */
+	/* Thoughts/approach: Each T gives us the relative orders of 3 characters in the password. */
 	
 	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);

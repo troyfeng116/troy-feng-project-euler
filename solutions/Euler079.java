@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- SOLVED -------- */
 
 /* A common security method used for online banking is to ask the user for three random characters from 
  * a passcode. For example, if the passcode was 531278, they may ask for the 2nd, 3rd, and 5th characters; 
@@ -43,6 +43,7 @@ public class Euler079 {
 	static final String NONE = "SMTH WRONG";
 	static final int numNodes = 126-33+1;
 
+	/* Return true if the graph has no more nodes remaining. */
 	public static boolean allEdgesGone(int[] indegree) {
 		for (int v: indegree) {
 			if (v >= 0) return false;
@@ -50,41 +51,51 @@ public class Euler079 {
 		return true;
 	}
 
+	/* Given a digraph in adj matrix form and indegrees of each node, run topological sort. At each step,
+	 * find the node with i) smallest ASCII value and ii) indegree 0. Instead of adding to queue for DFS
+	 * as in normal topsort, add it to string, remove the node and its outbound edges from graph, and
+	 * reset the loop to find the next node to add (to preserve smallest lexicographic order). */
 	public static String findPassword(boolean[][] adj, int[] indegree) {
 		String ans = "";
 		while (!allEdgesGone(indegree)) {
 			boolean foundIndegreeZero = false;
+			/* Remove first (lexicographically) node with indegree 0 and all its outbound edges by
+			 * decrementing indegrees. */
 			for (int u = 0; u < indegree.length; u++) {
 				if (indegree[u] == 0) {
 					indegree[u]--;
 					foundIndegreeZero = true;
 					for (int v = 0; v < adj[u].length; v++) {
-						if (adj[u][v]) {
-							System.out.println("Removed edge " +((char) (u+33)) + ','+((char) (v+33)));
-							indegree[v]--;
-							System.out.println("Edge " + ((char) (v+33)) + " now has indegree " + indegree[v]);
-						}
+						if (adj[u][v]) indegree[v]--;
 					}
 					ans += (char)(u+33);
 					break;
 				}
 			}
+			/* If there are still nodes to be removed but none with indegree 0, topsort is impossible (i.e.
+			 * there is a cycle, so retrieving password is impossible). */
 			if (!foundIndegreeZero) break;
 		}
 		return allEdgesGone(indegree)? ans : NONE;
 	}
 	
 	public static void main(String[] args) {
+		/* Adjacency matrix: adj[u][v] is true iff there is an edge (u,v) in digraph. */
 		boolean[][] adj = new boolean[numNodes][numNodes];
+		/* indegree[v] holds the number of edges that end at v. Note that indegree[-1] means the node
+		 * doesn't exist in the graph. */
 		int[] indegree = new int[numNodes];
 		Arrays.fill(indegree,-1);
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
+		/* Process inputs, fill adj and indegree. */
 		for (int t0 = 0; t0 < t; t0++) {
 			String input = s.nextLine();
 			for (int i = 0; i < 2; i++) {
 				int u = input.charAt(i)-33;
 				int v = input.charAt(i+1)-33;
+				/* Ignore multi-edges to preserve proper indegree (topsort needs DAG). */
+				if (adj[u][v]) continue;
 				adj[u][v] = true;
 				indegree[u] = indegree[u]==-1? 0 : indegree[u];
 				indegree[v] = indegree[v]==-1? 1 : indegree[v]+1;

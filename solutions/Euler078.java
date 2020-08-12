@@ -54,17 +54,13 @@ public class Euler078 {
 				int g1 = genPent(k);
 				if (g1 > n) break;
 				sum += k%2==1? p[n-g1] : -1*p[n-g1];
+				if (sum < 0) sum += MOD;
 				int g2 = genPent(-k);
 				if (g2 > n) break;
 				sum += k%2==1? p[n-g2] : -1*p[n-g2];
+				if (sum < 0) sum += MOD;
 				sum %= MOD;
 			}
-			if (sum % MOD < 0) {
-				System.out.println(sum);
-				System.out.println(n);
-				break;
-			}
-			System.out.println(sum);
 			p[n] = sum % MOD;
 		}
 	}
@@ -72,8 +68,6 @@ public class Euler078 {
 	public static void main(String[] args) {
 		//fillNumSums();
 		fillP();
-		System.exit(0);
-
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {

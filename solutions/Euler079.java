@@ -38,27 +38,59 @@ public class Euler079 {
 	/* Thoughts/approach: Each T gives us the relative orders of 3 characters in the password. It seems
 	 * that we might be able to approach this as a digraph/topsort problem. I.e. if u comes before v, then
 	 * we add an edge (u,v) to the graph. Process all T inputs. Then run topological sort. When we add a 
-	 * node with in-degree 0, we pick the one with lowest ASCII. */
+	 * node with in-degree 0, we reset and keep picking the node with in-degree 0 with lowest ASCII. */
 
 	static final String NONE = "SMTH WRONG";
 	static final int numNodes = 126-33+1;
 
-	public static String findPassword(int[][] adj) {
-		
-		return NONE;
+	public static boolean allEdgesGone(int[] indegree) {
+		for (int v: indegree) {
+			if (v >= 0) return false;
+		}
+		return true;
+	}
+
+	public static String findPassword(boolean[][] adj, int[] indegree) {
+		String ans = "";
+		while (!allEdgesGone(indegree)) {
+			boolean foundIndegreeZero = false;
+			for (int u = 0; u < indegree.length; u++) {
+				if (indegree[u] == 0) {
+					indegree[u]--;
+					foundIndegreeZero = true;
+					for (int v = 0; v < adj[u].length; v++) {
+						if (adj[u][v]) {
+							System.out.println("Removed edge " +((char) (u+33)) + ','+((char) (v+33)));
+							indegree[v]--;
+							System.out.println("Edge " + ((char) (v+33)) + " now has indegree " + indegree[v]);
+						}
+					}
+					ans += (char)(u+33);
+					break;
+				}
+			}
+			if (!foundIndegreeZero) break;
+		}
+		return allEdgesGone(indegree)? ans : NONE;
 	}
 	
 	public static void main(String[] args) {
-		int[][] adj = new int[numNodes][numNodes];
+		boolean[][] adj = new boolean[numNodes][numNodes];
+		int[] indegree = new int[numNodes];
+		Arrays.fill(indegree,-1);
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
 			String input = s.nextLine();
 			for (int i = 0; i < 2; i++) {
-				adj[input.charAt(i)][input.charAt(i+1)] = 1;
+				int u = input.charAt(i)-33;
+				int v = input.charAt(i+1)-33;
+				adj[u][v] = true;
+				indegree[u] = indegree[u]==-1? 0 : indegree[u];
+				indegree[v] = indegree[v]==-1? 1 : indegree[v]+1;
 			}
 		}
-		findPassword(adj);
+		System.out.println(findPassword(adj,indegree));
 		s.close();
 	}
 }

@@ -29,17 +29,36 @@ n/.
  * INPUTS: 1 <= T <= 3000 */
 
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Euler079 {
 	
-	/* Thoughts/approach: Each T gives us the relative orders of 3 characters in the password. */
+	/* Thoughts/approach: Each T gives us the relative orders of 3 characters in the password. It seems
+	 * that we might be able to approach this as a digraph/topsort problem. I.e. if u comes before v, then
+	 * we add an edge (u,v) to the graph. Process all T inputs. Then run topological sort. When we add a 
+	 * node with in-degree 0, we pick the one with lowest ASCII. */
+
+	static final String NONE = "SMTH WRONG";
+	static final int numNodes = 126-33+1;
+
+	public static String findPassword(int[][] adj) {
+		
+		return NONE;
+	}
 	
 	public static void main(String[] args) {
+		int[][] adj = new int[numNodes][numNodes];
 		Scanner s = new Scanner(System.in);
 		int t = Integer.parseInt(s.nextLine());
 		for (int t0 = 0; t0 < t; t0++) {
-			
+			String input = s.nextLine();
+			for (int i = 0; i < 2; i++) {
+				adj[input.charAt(i)][input.charAt(i+1)] = 1;
+			}
 		}
+		findPassword(adj);
 		s.close();
 	}
 }

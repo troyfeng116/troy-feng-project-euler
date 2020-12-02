@@ -1,4 +1,4 @@
-/* -------- UNSOLVED: 87.5/100 -------- */
+/* -------- SOLVED -------- */
 
 /*
 In the 5x5 matrix below, the minimal path sum from the top left to the bottom right, by moving left, 
@@ -25,47 +25,39 @@ public class Euler083 {
     /*
      * Thoughts/approach: Dijkstra's shortest path algorithm. Compress input into
      * array of N^2 elements. Then from node u, there is an edge (u,v) for v = u+1,
-     * u-1, u+N, and u-N (barring edges/corners) with weight v.
+     * u-1, u+N, and u-N (barring edges/corners) with weight v. Start Dijkstra's
+     * from index 0 and dist[0] = arr[0].
      */
 
-    private static int findMin(long[] dist, boolean[] removed) {
-        long min = Long.MAX_VALUE;
-        int index = -1;
-        for (int i = 0; i < dist.length; i++) {
-            if (!removed[i] && dist[i] < min) {
-                min = dist[i];
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    private static void djikstra(long[] dist, int[] arr, int N) {
+    private static void dijkstra(long[] dist, int[] arr, int N) {
+        // Min heap: (k,v) = (dist[u], u) with priority k = dist[u]
         PriorityQueue<Pair> pq = new PriorityQueue<>(new PairComparator());
         pq.offer(new Pair(arr[0], 0));
+        boolean[] visited = new boolean[N * N];
         while (!pq.isEmpty()) {
             int u = pq.poll().second;
-            // For each neighbor v of u that hasn't been removed, check if dist can be
+            visited[u] = true;
+            // For each neighbor v of u that hasn't been visited, check if dist[v] can be
             // updated
-            if (u % N != 0) {
+            if (u % N != 0 && !visited[u - 1]) {
                 if (dist[u] + arr[u - 1] < dist[u - 1]) {
                     dist[u - 1] = dist[u] + arr[u - 1];
                     pq.offer(new Pair(dist[u - 1], u - 1));
                 }
             }
-            if (u % N != N - 1) {
+            if (u % N != N - 1 && !visited[u + 1]) {
                 if (dist[u] + arr[u + 1] < dist[u + 1]) {
                     dist[u + 1] = dist[u] + arr[u + 1];
                     pq.offer(new Pair(dist[u + 1], u + 1));
                 }
             }
-            if (u >= N) {
+            if (u >= N && !visited[u - N]) {
                 if (dist[u] + arr[u - N] < dist[u - N]) {
                     dist[u - N] = dist[u] + arr[u - N];
                     pq.offer(new Pair(dist[u - N], u - N));
                 }
             }
-            if (u < N * (N - 1)) {
+            if (u < N * (N - 1) && !visited[u + N]) {
                 if (dist[u] + arr[u + N] < dist[u + N]) {
                     dist[u + N] = dist[u] + arr[u + N];
                     pq.offer(new Pair(dist[u + N], u + N));
@@ -87,7 +79,7 @@ public class Euler083 {
         long[] dist = new long[N * N];
         Arrays.fill(dist, Long.MAX_VALUE);
         dist[0] = arr[0];
-        djikstra(dist, arr, N);
+        dijkstra(dist, arr, N);
         System.out.println(dist[N * N - 1]);
         s.close();
     }
@@ -107,6 +99,6 @@ class Pair {
 class PairComparator implements Comparator<Pair> {
     @Override
     public int compare(Pair x, Pair y) {
-        return x.second - y.second;
+        return x.first < y.first ? -1 : x.first > y.first ? 1 : 0;
     }
 }

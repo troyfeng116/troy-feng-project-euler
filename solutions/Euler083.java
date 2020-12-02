@@ -1,4 +1,4 @@
-/* -------- UNSOLVED -------- */
+/* -------- UNSOLVED: 87.5/100 -------- */
 
 /*
 In the 5x5 matrix below, the minimal path sum from the top left to the bottom right, by moving left, 
@@ -17,6 +17,8 @@ INPUTS: 1 <= N <= 700, N lines of N space-separated entries, 1 <= matrix entries
 
 import java.util.Scanner;
 import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.Comparator;
 
 public class Euler083 {
 
@@ -38,24 +40,36 @@ public class Euler083 {
         return index;
     }
 
-    private static void djikstra(long[] dist, int[] arr, boolean[] removed, int N) {
-        int u;
-        while ((u = findMin(dist, removed)) >= 0) {
-            System.out.println("REMOVED " + u);
-            removed[u] = true;
+    private static void djikstra(long[] dist, int[] arr, int N) {
+        PriorityQueue<Pair> pq = new PriorityQueue<>(new PairComparator());
+        pq.offer(new Pair(arr[0], 0));
+        while (!pq.isEmpty()) {
+            int u = pq.poll().second;
             // For each neighbor v of u that hasn't been removed, check if dist can be
             // updated
-            if (u % N != 0 && !removed[u - 1]) {
-                dist[u - 1] = Math.min(dist[u] + arr[u - 1], dist[u - 1]);
+            if (u % N != 0) {
+                if (dist[u] + arr[u - 1] < dist[u - 1]) {
+                    dist[u - 1] = dist[u] + arr[u - 1];
+                    pq.offer(new Pair(dist[u - 1], u - 1));
+                }
             }
-            if (u % N != N - 1 && !removed[u + 1]) {
-                dist[u + 1] = Math.min(dist[u] + arr[u + 1], dist[u + 1]);
+            if (u % N != N - 1) {
+                if (dist[u] + arr[u + 1] < dist[u + 1]) {
+                    dist[u + 1] = dist[u] + arr[u + 1];
+                    pq.offer(new Pair(dist[u + 1], u + 1));
+                }
             }
-            if (u >= N && !removed[u - N]) {
-                dist[u - N] = Math.min(dist[u] + arr[u - N], dist[u - N]);
+            if (u >= N) {
+                if (dist[u] + arr[u - N] < dist[u - N]) {
+                    dist[u - N] = dist[u] + arr[u - N];
+                    pq.offer(new Pair(dist[u - N], u - N));
+                }
             }
-            if (u < N * (N - 1) && !removed[u + N]) {
-                dist[u + N] = Math.min(dist[u] + arr[u + N], dist[u + N]);
+            if (u < N * (N - 1)) {
+                if (dist[u] + arr[u + N] < dist[u + N]) {
+                    dist[u + N] = dist[u] + arr[u + N];
+                    pq.offer(new Pair(dist[u + N], u + N));
+                }
             }
         }
     }
@@ -71,11 +85,28 @@ public class Euler083 {
             }
         }
         long[] dist = new long[N * N];
-        boolean[] removed = new boolean[N * N];
         Arrays.fill(dist, Long.MAX_VALUE);
         dist[0] = arr[0];
-        djikstra(dist, arr, removed, N);
+        djikstra(dist, arr, N);
         System.out.println(dist[N * N - 1]);
         s.close();
+    }
+}
+
+// (k,v) = (dist, index)
+class Pair {
+    long first;
+    int second;
+
+    public Pair(long f, int s) {
+        first = f;
+        second = s;
+    }
+}
+
+class PairComparator implements Comparator<Pair> {
+    @Override
+    public int compare(Pair x, Pair y) {
+        return x.second - y.second;
     }
 }
